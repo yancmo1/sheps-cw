@@ -1,0 +1,238 @@
+{
+  "main": {
+    "id": "71a6ecd9ca3f1106",
+    "type": "split",
+    "children": [
+      {
+        "id": "04a56e4946d16d95",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "14af50b8502c4f92",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Projects/CW Trainer/Docs/Adaptive Learning.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Adaptive Learning"
+            }
+          },
+          {
+            "id": "de0262492ad07589",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "Projects/CW Trainer/Diagrams/Overview.excalidraw.md"
+              },
+              "icon": "excalidraw-icon",
+              "title": "Overview.excalidraw"
+            }
+          },
+          {
+            "id": "7410e715544f935f",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "Projects/CW Trainer/Diagrams/Learning Engine.excalidraw.md"
+              },
+              "icon": "excalidraw-icon",
+              "title": "Learning Engine.excalidraw"
+            }
+          }
+        ],
+        "currentTab": 2
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "1f4b168703d4c001",
+    "type": "split",
+    "children": [
+      {
+        "id": "d7fb8a5d9ba33736",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e88f0080006318b3",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "ec63ec8ba8d97d13",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "91e901523e234a78",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "30a8af6c5570a89a",
+    "type": "split",
+    "children": [
+      {
+        "id": "238ea8b21004cbc9",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f936dd49997e627a",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Projects/CW Trainer/Diagrams/Learning Engine.excalidraw.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for Learning Engine.excalidraw"
+            }
+          },
+          {
+            "id": "7e8a5abe647cab1f",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Projects/CW Trainer/Diagrams/Learning Engine.excalidraw.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from Learning Engine.excalidraw"
+            }
+          },
+          {
+            "id": "d299c56efcfcde76",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "79a53c9ff753012b",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "6bbf0848c9e86c24",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Projects/CW Trainer/Diagrams/Learning Engine.excalidraw.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of Learning Engine.excalidraw"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false,
+      "obsidian-excalidraw-plugin:New drawing": false,
+      "templater-obsidian:Templater": false
+    }
+  },
+  "active": "7410e715544f935f",
+  "lastOpenFiles": [
+    "Projects/CW Trainer/Diagrams/Overview.excalidraw.md",
+    "Projects/CW Trainer/Diagrams/Learning Engine.excalidraw.md",
+    "Projects/CW Trainer/Readme.md",
+    "Projects/CW Trainer/PRD.md",
+    "Projects/CW Trainer/Glossary.md",
+    "Projects/CW Trainer/Future Ideas.md",
+    "Projects/CW Trainer/CW Trainer.md",
+    "Projects/CW Trainer/Docs/Statistics.md",
+    "Projects/CW Trainer/Docs/Session.md",
+    "Projects/CW Trainer/Docs/Learning Engine.md",
+    "Projects/CW Trainer/Docs/Audio Engine.md",
+    "Projects/CW Trainer/Docs/Adaptive Learning.md",
+    "Excalidraw/Learning Engine.excalidraw.md",
+    "Excalidraw",
+    "Projects/CW Trainer/Docs",
+    "Projects/CW Trainer/Diagrams",
+    "Daily Notes/June 26, 2026.md",
+    "2026-06-25.md",
+    "Projects/CW Trainer/CW Trainer.md.md",
+    "Projects/CW Trainer/Untitled.canvas",
+    "Projects/CW Trainer/Overview.excalidraw",
+    "Projects/CW Trainer/Excalidraw/Overview.excalidraw.crswap"
+  ]
+}
