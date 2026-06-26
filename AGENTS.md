@@ -2,21 +2,46 @@
 
 ## Project Snapshot
 
-Sheps CW is an early-stage Morse code training project by W5XY Labs. The current runnable app is a Vite + React dashboard under `app/`, branded around Dit Dit / Didah Trainer. The long-term direction is a core-first CW learning engine that can run behind desktop UI, Raspberry Pi deployment, and future dedicated hardware.
+Sheps CW is an early-stage Morse code training project by W5XY Labs. The current forward app direction is the Dit Dit touch-first React app under `app/ditdit/`. The long-term direction is a core-first CW learning engine that can run behind desktop UI, Raspberry Pi deployment, and future dedicated hardware.
 
 The repository also doubles as an Obsidian planning vault. Project intent and feature notes live under `docs/`; keep those notes readable in Obsidian and preserve existing wiki-link style where present.
 
 ## Current Stack
 
 - Frontend: React 19, Vite 8, JavaScript modules.
-- Linting: `oxlint` via `npm run lint` in `app/`.
-- Build: `npm run build` in `app/`.
-- Container: `docker-compose.yml` builds `app/Dockerfile` and serves the Vite build with nginx on host port `8080`.
+- Current app target: `app/ditdit/`.
+- Earlier dashboard prototype still exists under `app/src/`.
+- Build/dev commands should be run from the intended app folder.
+- Container: `docker-compose.yml` currently builds `app/Dockerfile` from `./app` and serves with nginx on host port `8080`.
 - Root `src/`, `tests/`, and `assets/` are placeholders for future non-UI/core work.
+
+## Important Structure Warning
+
+There are currently two React app areas:
+
+```text
+app/src/            # earlier dashboard prototype
+app/ditdit/src/     # newer Dit Dit touch-first app
+```
+
+Prefer `app/ditdit/` for new React work unless the user explicitly chooses to move the app back to top-level `app/`.
+
+Do not accidentally add new feature work to the older `app/src/` dashboard if the task is about Dit Dit.
 
 ## Useful Commands
 
 Run these from the repository root unless noted.
+
+For the current Dit Dit app:
+
+```sh
+cd app/ditdit
+npm run dev
+npm run build
+npm run preview
+```
+
+For the older top-level app, only if intentionally working there:
 
 ```sh
 cd app
@@ -25,9 +50,13 @@ npm run lint
 npm run build
 ```
 
+Docker currently uses the top-level `app/` Dockerfile/context:
+
 ```sh
 docker compose up --build
 ```
+
+Before relying on Docker for the new Dit Dit app, verify whether Docker has been updated to build `app/ditdit/`.
 
 ## Architecture Intent
 
@@ -47,21 +76,32 @@ When adding core behavior, prefer pure, testable modules that can later be reuse
 
 - Company/developer brand: W5XY Labs.
 - Leading product name: Dit Dit.
+- Device/app language: Dit Dit / Dit Dit Box / CW Trainer.
 - Learning-method language: Didah / Didah Method.
-- Product tone should be friendly, approachable, and learning-focused rather than a generic engineering utility.
+- Product tone should be friendly, approachable, touch-first, and learning-focused rather than a generic engineering utility.
 - Long Island CW Club (LICW), Koch Method, CW Ops, CW Academy, and custom lesson plans are expected future learning-path inputs.
 
 ## Current App Notes
 
+Current target app:
+
+- App folder: `app/ditdit/`.
+- Main entry: `app/ditdit/src/main.jsx`.
+- App shell: `app/ditdit/src/App.jsx`.
+- Styling: `app/ditdit/src/styles.css`.
+- Home actions: Practice, Settings, Exit to Desktop.
+- Practice, Settings, and Exit are placeholders only.
+- Exit handling should eventually connect to the Raspberry Pi launcher/kiosk layer.
+
+Older prototype still present:
+
 - Main entry: `app/src/main.jsx`.
 - App shell: `app/src/App.jsx`.
-- Current dashboard: `app/src/Dashboard.jsx`.
-- Global CSS reset: `app/src/index.css`.
-- Styling is currently inline in `Dashboard.jsx`; if the UI grows, migrate carefully toward local components/styles without mixing unrelated refactors into feature work.
+- Dashboard: `app/src/Dashboard.jsx`.
 
 ## Working Conventions
 
-- Do not treat the root README status as fully current; it still says no production code exists, but the React app now exists.
+- Do not treat the root README status as fully current; it still describes the project as earlier than the current app state.
 - Avoid committing or modifying Obsidian workspace state such as `.obsidian/workspace.json` unless the user explicitly asks.
 - Leave unrelated dirty files alone.
 - Use focused changes and update docs when architecture or product decisions become concrete.
@@ -69,7 +109,9 @@ When adding core behavior, prefer pure, testable modules that can later be reuse
 
 ## Known Gaps
 
-- `docs/PRD.md` is currently empty.
-- Several feature docs are placeholders.
+- Docker may still be aligned with the older top-level `app/` package instead of `app/ditdit/`.
+- The root README is stale and should be updated soon.
 - No real Morse timing engine, lesson engine, audio engine, statistics engine, persistence layer, or hardware abstraction exists yet.
-- The dashboard button does not start a practice flow yet.
+- The Practice button does not start a real practice flow yet.
+- The Settings screen is a placeholder.
+- The Exit to Desktop screen is a placeholder and needs Pi launcher integration.
