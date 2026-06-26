@@ -1,18 +1,110 @@
-// src/pages/Dashboard.jsx
+import React from 'react';
+
+const styles = {
+  page: {
+    minHeight: "100vh",
+    background: "#0f172a",
+    color: "#fff",
+    padding: "24px",
+    fontFamily: 'system-ui, -apple-system, sans-serif',
+  },
+  section: {
+    maxWidth: "56rem",
+    margin: "0 auto",
+    display: "flex",
+    flexDirection: "column",
+    gap: "24px",
+  },
+  header: {
+    marginBottom: "8px",
+  },
+  headerLabel: {
+    fontSize: "14px",
+    color: "#94a3b8",
+    margin: "0 0 4px 0",
+  },
+  title: {
+    fontSize: "32px",
+    fontWeight: 700,
+    margin: "0 0 12px 0",
+  },
+  subtitle: {
+    fontSize: "16px",
+    color: "#cbd5e1",
+    margin: 0,
+  },
+  grid: {
+    display: "grid",
+    gap: "16px",
+    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+  },
+  card: {
+    borderRadius: "16px",
+    border: "1px solid #1e293b",
+    background: "#1e293b",
+    padding: "20px",
+  },
+  cardLabel: {
+    fontSize: "14px",
+    color: "#94a3b8",
+    margin: 0,
+  },
+  cardValue: {
+    fontSize: "24px",
+    fontWeight: 700,
+    margin: "12px 0 0 0",
+  },
+  cardDesc: {
+    fontSize: "14px",
+    color: "#cbd5e1",
+    margin: "12px 0 0 0",
+  },
+  focusBox: {
+    borderRadius: "16px",
+    border: "1px solid #1e293b",
+    background: "#1e293b",
+    padding: "20px",
+  },
+  focusTitle: {
+    fontSize: "20px",
+    fontWeight: 600,
+    margin: "0 0 8px 0",
+  },
+  focusText: {
+    fontSize: "16px",
+    color: "#cbd5e1",
+    margin: 0,
+  },
+  button: {
+    marginTop: "16px",
+    borderRadius: "12px",
+    background: "#fff",
+    color: "#0f172a",
+    padding: "10px 16px",
+    fontSize: "16px",
+    fontWeight: 500,
+    border: "none",
+    cursor: "pointer",
+    transition: "background 0.2s",
+  },
+  buttonHover: {
+    background: "#e2e8f0",
+  },
+};
 
 export default function Dashboard() {
+  const [buttonHover, setButtonHover] = React.useState(false);
+
   return (
-    <main className="min-h-screen bg-slate-950 text-white p-6">
-      <section className="max-w-5xl mx-auto space-y-6">
-        <div>
-          <p className="text-sm text-slate-400">W5XY Labs</p>
-          <h1 className="text-3xl font-bold">Didah Trainer</h1>
-          <p className="text-slate-300 mt-2">
-            A simple CW learning dashboard to start building from.
-          </p>
+    <main style={styles.page}>
+      <section style={styles.section}>
+        <div style={styles.header}>
+          <p style={styles.headerLabel}>W5XY Labs</p>
+          <h1 style={styles.title}>Dit Dit Box</h1>
+          <p style={styles.subtitle}>Didah Trainer is ready.</p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div style={styles.grid}>
           <DashboardCard
             title="Practice"
             value="Start"
@@ -32,14 +124,20 @@ export default function Dashboard() {
           />
         </div>
 
-        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-          <h2 className="text-xl font-semibold mb-2">Today’s Focus</h2>
-          <p className="text-slate-300">
-            Get the dashboard on screen. No pressure. No fancy logic yet.
-            Just prove the page works.
+        <div style={styles.focusBox}>
+          <h2 style={styles.focusTitle}>Today's Focus</h2>
+          <p style={styles.focusText}>
+            Didah Trainer is ready.
           </p>
 
-          <button className="mt-4 rounded-xl bg-white px-4 py-2 text-slate-950 font-medium hover:bg-slate-200">
+          <button
+            style={{
+              ...styles.button,
+              ...(buttonHover ? styles.buttonHover : {}),
+            }}
+            onMouseEnter={() => setButtonHover(true)}
+            onMouseLeave={() => setButtonHover(false)}
+          >
             Start Practice
           </button>
         </div>
@@ -50,10 +148,10 @@ export default function Dashboard() {
 
 function DashboardCard({ title, value, description }) {
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-      <p className="text-sm text-slate-400">{title}</p>
-      <p className="text-2xl font-bold mt-2">{value}</p>
-      <p className="text-sm text-slate-300 mt-2">{description}</p>
+    <div style={styles.card}>
+      <p style={styles.cardLabel}>{title}</p>
+      <p style={styles.cardValue}>{value}</p>
+      <p style={styles.cardDesc}>{description}</p>
     </div>
   );
 }
