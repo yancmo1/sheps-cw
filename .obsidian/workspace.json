@@ -11,10 +11,24 @@
             "id": "14af50b8502c4f92",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "docs/Features/Boot up.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "Boot up"
             }
           }
         ]
@@ -183,21 +197,27 @@
   },
   "active": "14af50b8502c4f92",
   "lastOpenFiles": [
-    "app/dist/index.html",
-    "app/dist/assets/index-CyzZqEEh.js",
-    "app/dist/assets/index-CTt4iX3N.css",
-    "app/dist/assets",
+    "app/ditdit/node_modules",
+    "app/ditdit/dist/assets/index-Btj8QyEC.js",
+    "app/ditdit/dist/assets/index-B2xsK3OK.css",
+    "app/ditdit/dist/index.html",
+    "app/ditdit/dist/assets",
+    "app/ditdit/dist",
+    "app/ditdit/README.md",
+    "app/ditdit/src/styles.css",
+    "app/ditdit/src/App.jsx",
+    "app/ditdit/src/main.jsx",
+    "app/ditdit/vite.config.js",
+    "app/ditdit/index.html",
+    "prd-ignored/DitDit_App_Shell_PRD.md",
+    "AGENTS.md",
+    "docs/Features/Boot up.md",
     "app/dist/icons.svg",
     "app/dist/favicon.svg",
-    "app/dist",
     "media/downloads.png.md",
-    "media",
     "docs/Daily Notes/June 27, 2026.md",
     "docs/Daily Notes/June 26, 2026.md",
     "docs/Branding/Branding.md",
-    "app/Dockerfile",
-    "app/dockerfile.",
-    "docker-compose.yml",
     "Projects/CW Trainer/Diagrams/Overview.excalidraw.md",
     "Projects/CW Trainer/Diagrams/Learning Engine.excalidraw.md",
     "Projects/CW Trainer/Readme.md",
@@ -211,8 +231,6 @@
     "Projects/CW Trainer/Docs/Audio Engine.md",
     "Projects/CW Trainer/Docs/Adaptive Learning.md",
     "Excalidraw/Learning Engine.excalidraw.md",
-    "Excalidraw",
-    "Projects/CW Trainer/Docs",
     "Daily Notes/June 26, 2026.md",
     "2026-06-25.md",
     "Projects/CW Trainer/CW Trainer.md.md",

@@ -1,0 +1,1 @@
+On Boot up of the pi there should be a timed message saying didah trainer is about to start. Cancel to desktop or continue. Something like that. 

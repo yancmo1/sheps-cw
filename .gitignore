@@ -27,3 +27,6 @@ build/
 
 # Node
 node_modules/
+
+#Folders
+prd-ignored/
