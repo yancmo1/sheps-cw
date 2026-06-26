@@ -5,6 +5,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMPOSE_FILE="$SCRIPT_DIR/docker-compose.yml"
 DITDIT_URL="${DITDIT_URL:-http://localhost:3000}"
 WAIT_SECONDS="${WAIT_SECONDS:-60}"
+LOG_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/ditdit"
+CHROMIUM_LOG="$LOG_DIR/chromium.log"
 
 run_compose() {
   if docker compose version >/dev/null 2>&1; then
@@ -92,6 +94,9 @@ wait_for_ditdit
 CHROMIUM="$(find_chromium)"
 ensure_desktop_session
 
+mkdir -p "$LOG_DIR"
+export LIBGL_ALWAYS_SOFTWARE="${LIBGL_ALWAYS_SOFTWARE:-1}"
+
 exec "$CHROMIUM" \
   --kiosk \
   --start-fullscreen \
@@ -99,8 +104,15 @@ exec "$CHROMIUM" \
   --noerrdialogs \
   --disable-infobars \
   --disable-session-crashed-bubble \
+  --disable-gpu \
+  --disable-gpu-compositing \
+  --disable-gpu-rasterization \
+  --disable-accelerated-2d-canvas \
+  --disable-accelerated-video-decode \
+  --disable-dev-shm-usage \
   --disable-pinch \
   --overscroll-history-navigation=0 \
   --check-for-update-interval=31536000 \
   --touch-events=enabled \
-  --app="$DITDIT_URL"
+  --app="$DITDIT_URL" \
+  >"$CHROMIUM_LOG" 2>&1

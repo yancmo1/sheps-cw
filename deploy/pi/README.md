@@ -92,6 +92,24 @@ This creates a `Dit Dit` launcher on the Pi desktop and in the local application
 
 Some Raspberry Pi desktop environments may ask you to trust or allow the launcher the first time you click it.
 
+The shortcut runs without opening a terminal window. Chromium output is written to:
+
+```text
+~/.cache/ditdit/chromium.log
+```
+
+## Chromium GPU Messages
+
+Some Raspberry Pi Chromium builds print EGL or GPU context errors such as:
+
+```text
+eglCreateContext: Requested version is not supported
+EGL_BAD_ATTRIBUTE
+CollectGraphicsInfo failed
+```
+
+Dit Dit does not need GPU acceleration yet, so the kiosk launcher disables Chromium GPU acceleration and uses software rendering. If the app opens correctly, these messages are not usually fatal.
+
 ## Stop The App
 
 From the repository root:

@@ -24,7 +24,7 @@ Name=Dit Dit
 Comment=Start Dit Dit kiosk mode
 Exec=/usr/bin/env bash "$LAUNCHER"
 Path=$REPO_ROOT
-Terminal=true
+Terminal=false
 Categories=Education;
 StartupNotify=false
 EOF
