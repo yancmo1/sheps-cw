@@ -65,11 +65,32 @@ The script:
 
 Chromium must run on the Pi desktop session. Do not run this script from a headless SSH-only session unless the desktop display environment is already available.
 
+If you see an error like this:
+
+```text
+Missing X server or $DISPLAY
+The platform failed to initialize.
+```
+
+Chromium was launched without access to the Pi display. Start the kiosk from the Pi desktop, or install the desktop shortcut below.
+
 You can override the target URL or wait timeout:
 
 ```bash
 DITDIT_URL=http://localhost:3000 WAIT_SECONDS=90 deploy/pi/start-ditdit-kiosk.sh
 ```
+
+## Install A Desktop Shortcut
+
+From the repository root on the Pi:
+
+```bash
+deploy/pi/install-desktop-shortcut.sh
+```
+
+This creates a `Dit Dit` launcher on the Pi desktop and in the local applications menu. Use that shortcut from the Pi desktop session to start Docker Compose and launch Chromium kiosk mode.
+
+Some Raspberry Pi desktop environments may ask you to trust or allow the launcher the first time you click it.
 
 ## Stop The App
 

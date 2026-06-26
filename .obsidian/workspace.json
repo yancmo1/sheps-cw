@@ -197,6 +197,7 @@
   },
   "active": "14af50b8502c4f92",
   "lastOpenFiles": [
+    "deploy/pi/install-desktop-shortcut.sh",
     "docs/Features/Kiosk Startup and Exit.md",
     "docs/Architecture/Current App Structure.md",
     "deploy/pi/README.md",
@@ -232,7 +233,6 @@
     "app/ditdit/node_modules/@rolldown/binding-darwin-arm64/README.md",
     "app/ditdit/node_modules/@oxc-project/types/README.md",
     "docs/Features/Boot up.md",
-    "app/ditdit/README.md",
     "app/dist/icons.svg",
     "app/dist/favicon.svg",
     "Projects/CW Trainer/Untitled.canvas"

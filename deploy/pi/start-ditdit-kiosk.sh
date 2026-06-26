@@ -33,6 +33,34 @@ find_chromium() {
   exit 1
 }
 
+ensure_desktop_session() {
+  if [[ -n "${DISPLAY:-}" || -n "${WAYLAND_DISPLAY:-}" ]]; then
+    return
+  fi
+
+  if [[ -S /tmp/.X11-unix/X0 ]]; then
+    export DISPLAY=:0
+    echo "DISPLAY was not set. Using DISPLAY=:0."
+    return
+  fi
+
+  cat >&2 <<'EOF'
+No Raspberry Pi desktop session was detected.
+
+Chromium kiosk mode must be launched from the Pi desktop session, or from an
+environment that has DISPLAY or WAYLAND_DISPLAY set. If you run this over plain
+SSH, Chromium cannot find the screen and exits with "Missing X server or
+$DISPLAY".
+
+Use the desktop shortcut installer:
+
+  deploy/pi/install-desktop-shortcut.sh
+
+Then launch Dit Dit from the Pi desktop.
+EOF
+  exit 1
+}
+
 wait_for_ditdit() {
   echo "Waiting for Dit Dit at $DITDIT_URL..."
 
@@ -62,6 +90,7 @@ run_compose up -d --build
 wait_for_ditdit
 
 CHROMIUM="$(find_chromium)"
+ensure_desktop_session
 
 exec "$CHROMIUM" \
   --kiosk \
