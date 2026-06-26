@@ -1,0 +1,9 @@
+services:
+  ditditbox:
+    build:
+      context: ./app
+    container_name: ditditbox
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    

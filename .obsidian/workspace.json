@@ -29,20 +29,32 @@
               "state": {
                 "file": "Projects/CW Trainer/Diagrams/Overview.excalidraw.md"
               },
-              "icon": "excalidraw-icon",
-              "title": "Overview.excalidraw"
+              "icon": "lucide-ghost",
+              "title": "excalidraw"
             }
           },
           {
             "id": "7410e715544f935f",
             "type": "leaf",
             "state": {
-              "type": "excalidraw",
+              "type": "markdown",
               "state": {
-                "file": "Projects/CW Trainer/Diagrams/Learning Engine.excalidraw.md"
+                "file": "docs/Branding/Branding.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
               },
-              "icon": "excalidraw-icon",
-              "title": "Learning Engine.excalidraw"
+              "icon": "lucide-file",
+              "title": "Branding"
             }
           }
         ],
@@ -212,6 +224,9 @@
   },
   "active": "7410e715544f935f",
   "lastOpenFiles": [
+    "app/Dockerfile",
+    "app/dockerfile.",
+    "docker-compose.yml",
     "Projects/CW Trainer/Diagrams/Overview.excalidraw.md",
     "Projects/CW Trainer/Diagrams/Learning Engine.excalidraw.md",
     "Projects/CW Trainer/Readme.md",
