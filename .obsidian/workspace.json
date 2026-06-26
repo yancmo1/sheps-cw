@@ -11,54 +11,13 @@
             "id": "14af50b8502c4f92",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Projects/CW Trainer/Docs/Adaptive Learning.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "Adaptive Learning"
-            }
-          },
-          {
-            "id": "de0262492ad07589",
-            "type": "leaf",
-            "state": {
-              "type": "excalidraw",
-              "state": {
-                "file": "Projects/CW Trainer/Diagrams/Overview.excalidraw.md"
-              },
-              "icon": "lucide-ghost",
-              "title": "excalidraw"
-            }
-          },
-          {
-            "id": "7410e715544f935f",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "docs/Branding/Branding.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "Branding"
+              "title": "New tab"
             }
           }
-        ],
-        "currentTab": 2
+        ]
       }
     ],
     "direction": "vertical"
@@ -222,8 +181,13 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "7410e715544f935f",
+  "active": "d4bada186fa92ab8",
   "lastOpenFiles": [
+    "media/downloads.png.md",
+    "media",
+    "docs/Daily Notes/June 27, 2026.md",
+    "docs/Daily Notes/June 26, 2026.md",
+    "docs/Branding/Branding.md",
     "app/Dockerfile",
     "app/dockerfile.",
     "docker-compose.yml",

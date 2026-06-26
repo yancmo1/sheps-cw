@@ -1,5 +1,8 @@
 FROM node:22-alpine AS build
 
+LABEL maintainer="yancyshepherd"
+LABEL description="Didah Trainer - CW learning dashboard"
+
 WORKDIR /app
 
 COPY package*.json ./
