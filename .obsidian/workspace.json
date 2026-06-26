@@ -197,6 +197,9 @@
   },
   "active": "14af50b8502c4f92",
   "lastOpenFiles": [
+    "docs/Features/Kiosk Startup and Exit.md",
+    "docs/Architecture/Current App Structure.md",
+    "deploy/pi/README.md",
     "app/ditdit/node_modules/fsevents/package.json",
     "app/ditdit/node_modules/fsevents/fsevents.node",
     "app/ditdit/node_modules/fsevents/fsevents.js",
@@ -208,7 +211,6 @@
     "app/ditdit/dist/assets/index-Btj8QyEC.js",
     "app/ditdit/dist/assets/index-B2xsK3OK.css",
     "app/ditdit/dist/assets",
-    "deploy/pi/start-ditdit-kiosk.sh",
     "app/ditdit/node_modules/react-dom/README.md",
     "app/ditdit/node_modules/vite/README.md",
     "app/ditdit/node_modules/vite/LICENSE.md",
@@ -231,8 +233,6 @@
     "app/ditdit/node_modules/@oxc-project/types/README.md",
     "docs/Features/Boot up.md",
     "app/ditdit/README.md",
-    "prd-ignored/DitDit_App_Shell_PRD.md",
-    "AGENTS.md",
     "app/dist/icons.svg",
     "app/dist/favicon.svg",
     "Projects/CW Trainer/Untitled.canvas"

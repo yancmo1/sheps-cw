@@ -4,6 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMPOSE_FILE="$SCRIPT_DIR/docker-compose.yml"
 DITDIT_URL="${DITDIT_URL:-http://localhost:3000}"
+WAIT_SECONDS="${WAIT_SECONDS:-60}"
 
 run_compose() {
   if docker compose version >/dev/null 2>&1; then
@@ -32,22 +33,45 @@ find_chromium() {
   exit 1
 }
 
-run_compose up -d --build
+wait_for_ditdit() {
+  echo "Waiting for Dit Dit at $DITDIT_URL..."
 
-if command -v curl >/dev/null 2>&1; then
-  for _ in {1..30}; do
-    if curl --silent --fail "$DITDIT_URL" >/dev/null; then
-      break
+  for _ in $(seq 1 "$WAIT_SECONDS"); do
+    if command -v curl >/dev/null 2>&1; then
+      if curl --silent --fail "$DITDIT_URL" >/dev/null; then
+        return
+      fi
+    elif command -v wget >/dev/null 2>&1; then
+      if wget --quiet --spider "$DITDIT_URL"; then
+        return
+      fi
+    else
+      echo "curl or wget is required to wait for Dit Dit before launching kiosk mode." >&2
+      exit 1
     fi
+
     sleep 1
   done
-fi
+
+  echo "Dit Dit did not respond at $DITDIT_URL after $WAIT_SECONDS seconds." >&2
+  run_compose ps >&2 || true
+  exit 1
+}
+
+run_compose up -d --build
+wait_for_ditdit
 
 CHROMIUM="$(find_chromium)"
 
 exec "$CHROMIUM" \
   --kiosk \
+  --start-fullscreen \
+  --no-first-run \
   --noerrdialogs \
   --disable-infobars \
   --disable-session-crashed-bubble \
+  --disable-pinch \
+  --overscroll-history-navigation=0 \
+  --check-for-update-interval=31536000 \
+  --touch-events=enabled \
   --app="$DITDIT_URL"
