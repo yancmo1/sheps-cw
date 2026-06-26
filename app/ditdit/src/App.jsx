@@ -9,6 +9,20 @@ const screens = {
 
 export default function App() {
   const [screen, setScreen] = useState(screens.home)
+  const [exitMessage, setExitMessage] = useState(
+    'Dit Dit asked Chromium to close. If this screen is still visible, close the Chromium window from the Pi desktop.'
+  )
+
+  function exitToDesktop() {
+    window.close()
+
+    setTimeout(() => {
+      setExitMessage(
+        'Chromium did not allow Dit Dit to close this window automatically. Close the Chromium window from the Pi desktop to return to the desktop.'
+      )
+      setScreen(screens.exit)
+    }, 300)
+  }
 
   if (screen === screens.practice) {
     return (
@@ -39,7 +53,7 @@ export default function App() {
       <Shell>
         <PlaceholderScreen
           title="Exit to Desktop"
-          message="Exit handling will be added in the Raspberry Pi launcher layer."
+          message={exitMessage}
           onBack={() => setScreen(screens.home)}
         />
       </Shell>
@@ -60,7 +74,7 @@ export default function App() {
           <TouchButton onClick={() => setScreen(screens.settings)}>
             Settings
           </TouchButton>
-          <TouchButton variant="secondary" onClick={() => setScreen(screens.exit)}>
+          <TouchButton variant="secondary" onClick={exitToDesktop}>
             Exit to Desktop
           </TouchButton>
         </div>
