@@ -181,8 +181,15 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "d4bada186fa92ab8",
+  "active": "14af50b8502c4f92",
   "lastOpenFiles": [
+    "app/dist/index.html",
+    "app/dist/assets/index-CyzZqEEh.js",
+    "app/dist/assets/index-CTt4iX3N.css",
+    "app/dist/assets",
+    "app/dist/icons.svg",
+    "app/dist/favicon.svg",
+    "app/dist",
     "media/downloads.png.md",
     "media",
     "docs/Daily Notes/June 27, 2026.md",
@@ -206,12 +213,9 @@
     "Excalidraw/Learning Engine.excalidraw.md",
     "Excalidraw",
     "Projects/CW Trainer/Docs",
-    "Projects/CW Trainer/Diagrams",
     "Daily Notes/June 26, 2026.md",
     "2026-06-25.md",
     "Projects/CW Trainer/CW Trainer.md.md",
-    "Projects/CW Trainer/Untitled.canvas",
-    "Projects/CW Trainer/Overview.excalidraw",
-    "Projects/CW Trainer/Excalidraw/Overview.excalidraw.crswap"
+    "Projects/CW Trainer/Untitled.canvas"
   ]
 }
