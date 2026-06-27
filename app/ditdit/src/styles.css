@@ -88,6 +88,38 @@ h1 {
   margin-top: 36px;
 }
 
+@media (max-height: 700px) {
+  .home-screen {
+    min-height: calc(100svh - 64px);
+    justify-content: flex-start;
+    padding: 8px 0;
+  }
+
+  .brand-kicker {
+    margin-bottom: 8px;
+  }
+
+  .home-screen h1 {
+    font-size: clamp(3.25rem, 8vw, 5.4rem);
+  }
+
+  .subtitle {
+    margin-top: 10px;
+    font-size: clamp(1.2rem, 3vw, 2rem);
+  }
+
+  .action-stack {
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .home-screen .touch-button {
+    min-height: 64px;
+    padding: 14px 20px;
+    font-size: clamp(1.15rem, 2.6vw, 1.7rem);
+  }
+}
+
 .touch-button {
   min-height: 78px;
   width: 100%;

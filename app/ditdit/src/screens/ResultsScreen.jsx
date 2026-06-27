@@ -17,6 +17,7 @@ export default function ResultsScreen({ data, onPracticeAgain, onPracticeMissed,
   const {
     lessonName,
     mode,
+    sessionLength,
     attempted,
     correct,
     accuracy,
@@ -24,6 +25,7 @@ export default function ResultsScreen({ data, onPracticeAgain, onPracticeMissed,
   } = data
   const isIdentify = mode === 'identify'
   const hasMisses = isIdentify && missed.length > 0
+  const completionCount = isIdentify ? attempted : sessionLength
 
   return (
     <section className="screen results-screen" aria-labelledby="results-title">
@@ -43,12 +45,14 @@ export default function ResultsScreen({ data, onPracticeAgain, onPracticeMissed,
               <span className="mini-stat-value">{MODE_LABELS[mode] ?? MODE_LABELS.identify}</span>
             </div>
             <div className="mini-stat">
-              <span className="mini-stat-label">Correct</span>
-              <span className="mini-stat-value">{correct} / {attempted}</span>
+              <span className="mini-stat-label">{isIdentify ? 'Correct' : 'Reps'}</span>
+              <span className="mini-stat-value">
+                {isIdentify ? `${correct} / ${attempted}` : completionCount}
+              </span>
             </div>
             <div className="mini-stat">
-              <span className="mini-stat-label">Accuracy</span>
-              <span className="mini-stat-value">{accuracy}%</span>
+              <span className="mini-stat-label">{isIdentify ? 'Accuracy' : 'Tracking'}</span>
+              <span className="mini-stat-value">{isIdentify ? `${accuracy}%` : 'Not scored'}</span>
             </div>
           </div>
         </section>

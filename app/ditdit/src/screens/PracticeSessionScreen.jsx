@@ -135,7 +135,7 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
 
     resultsRef.current = [
       ...resultsRef.current,
-      { character: item.char, selected: item.char, correct: true },
+      { character: item.char, selected: null, correct: null },
     ]
   }
 
@@ -160,9 +160,13 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
 
     const completedItems = resultsRef.current
     const attempted = completedItems.length
-    const correct = completedItems.filter(item => item.correct).length
+    const correct = completedItems.filter(item => item.correct === true).length
     const accuracy = attempted > 0 ? Math.round((correct / attempted) * 100) : 0
-    const missed = [...new Set(completedItems.filter(item => !item.correct).map(item => item.character))]
+    const missed = [...new Set(
+      completedItems
+        .filter(item => item.correct === false)
+        .map(item => item.character)
+    )]
 
     onFinish({
       id: createSessionId(),

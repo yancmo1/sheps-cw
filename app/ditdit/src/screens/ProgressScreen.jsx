@@ -70,11 +70,15 @@ export default function ProgressScreen({ onPractice, onHome }) {
             </div>
             <div className="stat-card">
               <span className="stat-label">Overall Accuracy</span>
-              <span className="stat-value">{summary.overallAccuracy}%</span>
+              <span className="stat-value">
+                {summary.scoredSessionCount > 0 ? `${summary.overallAccuracy}%` : '—'}
+              </span>
             </div>
             <div className="stat-card">
               <span className="stat-label">Best Session</span>
-              <span className="stat-value">{summary.bestSessionAccuracy}%</span>
+              <span className="stat-value">
+                {summary.scoredSessionCount > 0 ? `${summary.bestSessionAccuracy}%` : '—'}
+              </span>
             </div>
           </div>
 
@@ -102,8 +106,14 @@ export default function ProgressScreen({ onPractice, onHome }) {
                   <p className="history-card-title">{session.lessonName}</p>
                   <div className="history-card-meta">
                     <span>{session.mode === 'listen' ? 'Listen Only' : 'Listen & Identify'}</span>
-                    <span>{session.correct} / {session.attempted}</span>
-                    <span>{session.accuracy}%</span>
+                    {session.mode === 'identify' ? (
+                      <>
+                        <span>{session.correct} / {session.attempted}</span>
+                        <span>{session.accuracy}%</span>
+                      </>
+                    ) : (
+                      <span>{session.sessionLength} reps · not scored</span>
+                    )}
                   </div>
                 </article>
               ))}

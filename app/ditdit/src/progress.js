@@ -21,11 +21,16 @@ function normalizeItems(items) {
       if (!character) return null
 
       const selected = typeof item.selected === 'string' ? item.selected : null
+      const correct = item.correct === null
+        ? null
+        : typeof item.correct === 'boolean'
+          ? item.correct
+          : Boolean(item.correct)
 
       return {
         character,
         selected,
-        correct: Boolean(item.correct),
+        correct,
       }
     })
     .filter(Boolean)
@@ -102,7 +107,7 @@ export function loadSessionHistory() {
 
 export function saveSessionResult(result) {
   const session = normalizeSession(result)
-  if (!session) {
+  if (!session || session.attempted === 0) {
     return loadSessionHistory()
   }
 
@@ -122,13 +127,15 @@ export function clearSessionHistory() {
 
 export function getProgressSummary(history) {
   const safeHistory = Array.isArray(history) ? history : []
+  const scoredSessions = safeHistory.filter(session => session?.mode === 'identify')
   const totalSessions = safeHistory.length
   const totalCharacters = safeHistory.reduce((sum, session) => sum + toNumber(session.attempted), 0)
-  const totalCorrect = safeHistory.reduce((sum, session) => sum + toNumber(session.correct), 0)
-  const overallAccuracy = totalCharacters > 0
-    ? Math.round((totalCorrect / totalCharacters) * 100)
+  const scoredCharacters = scoredSessions.reduce((sum, session) => sum + toNumber(session.attempted), 0)
+  const totalCorrect = scoredSessions.reduce((sum, session) => sum + toNumber(session.correct), 0)
+  const overallAccuracy = scoredCharacters > 0
+    ? Math.round((totalCorrect / scoredCharacters) * 100)
     : 0
-  const bestSessionAccuracy = safeHistory.reduce(
+  const bestSessionAccuracy = scoredSessions.reduce(
     (best, session) => Math.max(best, clampPercentage(session.accuracy)),
     0
   )
@@ -139,6 +146,7 @@ export function getProgressSummary(history) {
     totalCorrect,
     overallAccuracy,
     bestSessionAccuracy,
+    scoredSessionCount: scoredSessions.length,
     recentSessions: safeHistory.slice(0, 10),
   }
 }
