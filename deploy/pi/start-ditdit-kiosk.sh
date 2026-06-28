@@ -8,6 +8,8 @@ DITDIT_URL="${DITDIT_URL:-http://localhost:3000}"
 WAIT_SECONDS="${WAIT_SECONDS:-60}"
 DITDIT_CONTAINER_NAME="${DITDIT_CONTAINER_NAME:-ditdit}"
 DITDIT_BUILD_ON_START="${DITDIT_BUILD_ON_START:-0}"
+STARTUP_CANCEL_ENABLED="${STARTUP_CANCEL_ENABLED:-1}"
+STARTUP_CANCEL_SECONDS="${STARTUP_CANCEL_SECONDS:-10}"
 LOG_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/ditdit"
 CHROMIUM_LOG="$LOG_DIR/chromium.log"
 
@@ -119,11 +121,56 @@ wait_for_ditdit() {
   exit 1
 }
 
+show_startup_cancel_window() {
+  if [[ "$STARTUP_CANCEL_ENABLED" != "1" ]]; then
+    return
+  fi
+
+  if ! [[ "$STARTUP_CANCEL_SECONDS" =~ ^[0-9]+$ ]]; then
+    echo "STARTUP_CANCEL_SECONDS must be a whole number. Using 10 seconds."
+    STARTUP_CANCEL_SECONDS=10
+  fi
+
+  if ! command -v zenity >/dev/null 2>&1; then
+    echo "zenity is not installed; skipping startup cancel window."
+    return
+  fi
+
+  local zenity_exit=0
+
+  zenity \
+    --question \
+    --title="Dit Dit Startup" \
+    --ok-label="Launch Dit Dit" \
+    --cancel-label="Cancel to Desktop" \
+    --timeout="$STARTUP_CANCEL_SECONDS" \
+    --width=520 \
+    --text="Dit Dit will launch in $STARTUP_CANCEL_SECONDS seconds.\n\nSelect Cancel to Desktop to stay at the desktop." \
+    || zenity_exit=$?
+
+  case "$zenity_exit" in
+    0)
+      echo "Startup window confirmed: launching Dit Dit."
+      ;;
+    1)
+      echo "Startup canceled by user. Staying on desktop."
+      exit 0
+      ;;
+    5)
+      echo "Startup window timed out; launching Dit Dit."
+      ;;
+    *)
+      echo "Startup window failed with exit code $zenity_exit; launching Dit Dit."
+      ;;
+  esac
+}
+
 start_ditdit
 wait_for_ditdit
 
 CHROMIUM="$(find_chromium)"
 ensure_desktop_session
+show_startup_cancel_window
 
 mkdir -p "$LOG_DIR"
 export LIBGL_ALWAYS_SOFTWARE="${LIBGL_ALWAYS_SOFTWARE:-1}"

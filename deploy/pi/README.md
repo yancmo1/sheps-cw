@@ -79,6 +79,7 @@ The script:
 - Reuses the running `ditdit` container when already up (fast path).
 - Starts the Docker Compose app when needed.
 - Waits until `http://localhost:3000` responds.
+- Shows a visible startup window with `Launch Dit Dit` and `Cancel to Desktop` options.
 - Finds Chromium on the host.
 - Launches Chromium in kiosk mode pointed at Dit Dit.
 
@@ -87,6 +88,15 @@ To force an image rebuild on launch, set:
 ```bash
 DITDIT_BUILD_ON_START=1 deploy/pi/start-ditdit-kiosk.sh
 ```
+
+Startup cancel window options:
+
+```bash
+STARTUP_CANCEL_ENABLED=1 STARTUP_CANCEL_SECONDS=10 deploy/pi/start-ditdit-kiosk.sh
+```
+
+- `STARTUP_CANCEL_ENABLED=1` enables the visible cancel window (default).
+- `STARTUP_CANCEL_SECONDS=10` controls the countdown before auto-launch.
 
 Chromium must run on the Pi desktop session. Do not run this script from a headless SSH-only session unless the desktop display environment is already available.
 
