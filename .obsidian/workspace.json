@@ -197,6 +197,8 @@
   },
   "active": "14af50b8502c4f92",
   "lastOpenFiles": [
+    "app/ditdit/dist/assets/index-Cn5hHfuy.css",
+    "app/ditdit/dist/assets/index-AwoNJUeP.js",
     "deploy/pi/install-desktop-shortcut.sh",
     "docs/Features/Kiosk Startup and Exit.md",
     "docs/Architecture/Current App Structure.md",
@@ -210,8 +212,6 @@
     "app/ditdit/node_modules/fsevents",
     "app/ditdit/dist/index.html",
     "app/ditdit/dist/assets/index-Btj8QyEC.js",
-    "app/ditdit/dist/assets/index-B2xsK3OK.css",
-    "app/ditdit/dist/assets",
     "app/ditdit/node_modules/react-dom/README.md",
     "app/ditdit/node_modules/vite/README.md",
     "app/ditdit/node_modules/vite/LICENSE.md",
