@@ -1,110 +1,68 @@
 # Current App Structure
 
-Last Updated: June 26, 2026
+Last Updated: June 28, 2026
 
 ## Current State
 
-The repository currently has a split app structure:
+The repository now has a single active app location plus an archived prototype:
 
 ```text
 app/
-├── src/                 # earlier Vite dashboard prototype
-├── package.json         # earlier app package
+├── src/                 # active Dit Dit touch-first app
+├── package.json
 ├── package-lock.json
 ├── Dockerfile
-└── ditdit/
-    ├── package.json     # newer Dit Dit app package
-    └── src/
-        ├── App.jsx
-        ├── main.jsx
-        └── styles.css
+└── vite.config.js
+
+legacy/
+└── app-prototype/       # archived earlier dashboard prototype
 ```
 
-## Intended Direction
+## Why This Changed
 
-The newer `app/ditdit/` app appears to be the intended forward path because it has the touch-first Dit Dit interface with these main actions:
+The project previously had two competing app roots (`app/src` and `app/ditdit/src`), which caused confusion in scripts, Docker, and agent targeting. The Dit Dit app has now been promoted to top-level `app/`, and the older dashboard prototype was archived.
+
+## Active App Surface
+
+Current Dit Dit interface includes:
 
 - Practice
 - Settings
 - Exit to Desktop
 
-This app is closer to the Raspberry Pi kiosk goal than the older dashboard prototype.
+## Docker and Kiosk Alignment
 
-## Current Risk
-
-There are now two runnable-looking React app areas. This can confuse Codex, Docker, and future development.
-
-The project should avoid letting features split between:
-
-```text
-app/src/
-```
-
-and
-
-```text
-app/ditdit/src/
-```
-
-## Recommended Cleanup
-
-Recommended path:
-
-1. Treat `app/ditdit/` as the official Dit Dit app home.
-2. Update Docker to build from `app/ditdit/`.
-3. Update run commands in README and AGENTS.md.
-4. Either remove the older `app/src/` prototype or move it to an archive/reference folder.
-5. Keep future React work inside `app/ditdit/src/` unless the structure changes again intentionally.
-
-## Current Docker Mismatch
-
-`docker-compose.yml` currently uses:
+Both compose files now build from `app/`:
 
 ```yaml
 context: ./app
 ```
 
-That means Docker is currently aligned with the older top-level app package, not necessarily the new `app/ditdit` package.
+and
 
-Before kiosk work continues, this needs to be corrected or explicitly accepted.
+```yaml
+context: ../../app
+```
 
-## Suggested Future Layout
+## Recommended Working Rule
 
-If `app/ditdit/` remains the app home, a clean future layout could be:
+All new UI work should target:
 
 ```text
 app/
-└── ditdit/
-    ├── src/
-    │   ├── App.jsx
-    │   ├── main.jsx
-    │   ├── styles.css
-    │   ├── screens/
-    │   ├── components/
-    │   └── services/
-    ├── public/
-    ├── package.json
-    ├── package-lock.json
-    └── vite.config.js
-
-scripts/
-└── pi/
-    ├── launch-ditdit.sh
-    └── install-kiosk-service.sh
-
-docs/
-├── Architecture/
-├── Features/
-├── Branding/
-└── Daily Notes/
+└── src/
 ```
 
-## Rule for Codex
-
-Until the structure is cleaned up, Codex should confirm which app folder is intended before editing React files.
-
-Current preferred target:
+Do not add new product behavior in:
 
 ```text
-app/ditdit/
+legacy/app-prototype/
+```
+
+## Pi Install Path Note
+
+For cleanliness and single-purpose Pi deployment, prefer checkout/install path:
+
+```text
+/opt/ditdit
 ```

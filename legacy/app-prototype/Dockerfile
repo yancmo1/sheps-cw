@@ -1,15 +1,16 @@
 FROM node:22-alpine AS build
 
 LABEL maintainer="yancyshepherd"
-LABEL description="Dit Dit touchscreen CW trainer app"
+LABEL description="Didah Trainer - CW learning dashboard"
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 COPY . .
 RUN npm run build
+
 
 FROM nginx:alpine
 

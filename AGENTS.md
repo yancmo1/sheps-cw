@@ -2,31 +2,31 @@
 
 ## Project Snapshot
 
-Sheps CW is an early-stage Morse code training project by W5XY Labs. The current forward app direction is the Dit Dit touch-first React app under `app/ditdit/`. The long-term direction is a core-first CW learning engine that can run behind desktop UI, Raspberry Pi deployment, and future dedicated hardware.
+Sheps CW is an early-stage Morse code training project by W5XY Labs. The current forward app direction is the Dit Dit touch-first React app under `app/`. The long-term direction is a core-first CW learning engine that can run behind desktop UI, Raspberry Pi deployment, and future dedicated hardware.
 
 The repository also doubles as an Obsidian planning vault. Project intent and feature notes live under `docs/`; keep those notes readable in Obsidian and preserve existing wiki-link style where present.
 
 ## Current Stack
 
 - Frontend: React 19, Vite 8, JavaScript modules.
-- Current app target: `app/ditdit/`.
-- Earlier dashboard prototype still exists under `app/src/`.
+- Current app target: `app/`.
+- Earlier dashboard prototype has been archived under `legacy/app-prototype/`.
 - Build/dev commands should be run from the intended app folder.
 - Container: `docker-compose.yml` currently builds `app/Dockerfile` from `./app` and serves with nginx on host port `8080`.
 - Root `src/`, `tests/`, and `assets/` are placeholders for future non-UI/core work.
 
 ## Important Structure Warning
 
-There are currently two React app areas:
+There is one active React app and one archived prototype:
 
 ```text
-app/src/            # earlier dashboard prototype
-app/ditdit/src/     # newer Dit Dit touch-first app
+app/src/                          # active Dit Dit touch-first app
+legacy/app-prototype/src/         # archived dashboard prototype
 ```
 
-Prefer `app/ditdit/` for new React work unless the user explicitly chooses to move the app back to top-level `app/`.
+Prefer `app/` for all new React work.
 
-Do not accidentally add new feature work to the older `app/src/` dashboard if the task is about Dit Dit.
+Do not accidentally add new feature work to `legacy/app-prototype/`.
 
 ## Useful Commands
 
@@ -35,16 +35,16 @@ Run these from the repository root unless noted.
 For the current Dit Dit app:
 
 ```sh
-cd app/ditdit
+cd app
 npm run dev
 npm run build
 npm run preview
 ```
 
-For the older top-level app, only if intentionally working there:
+For the archived prototype, only if intentionally reviewing legacy work:
 
 ```sh
-cd app
+cd legacy/app-prototype
 npm run dev
 npm run lint
 npm run build
@@ -56,7 +56,7 @@ Docker currently uses the top-level `app/` Dockerfile/context:
 docker compose up --build
 ```
 
-Before relying on Docker for the new Dit Dit app, verify whether Docker has been updated to build `app/ditdit/`.
+Docker and Pi compose now point at top-level `app/`.
 
 ## Architecture Intent
 
@@ -85,19 +85,19 @@ When adding core behavior, prefer pure, testable modules that can later be reuse
 
 Current target app:
 
-- App folder: `app/ditdit/`.
-- Main entry: `app/ditdit/src/main.jsx`.
-- App shell: `app/ditdit/src/App.jsx`.
-- Styling: `app/ditdit/src/styles.css`.
+- App folder: `app/`.
+- Main entry: `app/src/main.jsx`.
+- App shell: `app/src/App.jsx`.
+- Styling: `app/src/styles.css`.
 - Home actions: Practice, Settings, Exit to Desktop.
 - Practice, Settings, and Exit are placeholders only.
 - Exit handling should eventually connect to the Raspberry Pi launcher/kiosk layer.
 
-Older prototype still present:
+Older prototype is archived under:
 
-- Main entry: `app/src/main.jsx`.
-- App shell: `app/src/App.jsx`.
-- Dashboard: `app/src/Dashboard.jsx`.
+- Main entry: `legacy/app-prototype/src/main.jsx`.
+- App shell: `legacy/app-prototype/src/App.jsx`.
+- Dashboard: `legacy/app-prototype/src/Dashboard.jsx`.
 
 ## Working Conventions
 
@@ -109,7 +109,7 @@ Older prototype still present:
 
 ## Known Gaps
 
-- Docker may still be aligned with the older top-level `app/` package instead of `app/ditdit/`.
+- Some deployed Pi installs may still have an older checkout under `/opt/ditditbox`; standardize to `/opt/ditdit`.
 - The root README is stale and should be updated soon.
 - No real Morse timing engine, lesson engine, audio engine, statistics engine, persistence layer, or hardware abstraction exists yet.
 - The Practice button does not start a real practice flow yet.

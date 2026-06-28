@@ -19,6 +19,24 @@ chmod +x "$LAUNCHER"
 echo "Installing desktop shortcut to $TARGET_DESKTOP_FILE..."
 mkdir -p "$DESKTOP_DIR"
 cp "$SOURCE_DESKTOP_FILE" "$TARGET_DESKTOP_FILE"
+
+echo "Updating desktop shortcut launcher path..."
+awk -v launcher="$LAUNCHER" '
+  BEGIN { replaced = 0 }
+  /^Exec=/ {
+    print "Exec=" launcher
+    replaced = 1
+    next
+  }
+  { print }
+  END {
+    if (!replaced) {
+      print "Exec=" launcher
+    }
+  }
+' "$TARGET_DESKTOP_FILE" > "$TARGET_DESKTOP_FILE.tmp"
+mv "$TARGET_DESKTOP_FILE.tmp" "$TARGET_DESKTOP_FILE"
+
 chmod +x "$TARGET_DESKTOP_FILE"
 
 if command -v gio >/dev/null 2>&1; then

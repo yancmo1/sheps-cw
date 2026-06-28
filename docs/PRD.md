@@ -1,6 +1,6 @@
 # Dit Dit PRD
 
-Last Updated: June 26, 2026
+Last Updated: June 28, 2026
 
 ## Product Summary
 
@@ -10,31 +10,29 @@ Dit Dit is built under the W5XY Labs brand and uses Didah/CW language to keep th
 
 ## Current Repository Reality
 
-The repo now contains two app areas:
+The repo now has one active app area and one archived prototype:
 
 ```text
 app/
-├── src/                 # earlier Vite dashboard prototype
-├── package.json         # earlier app package
-├── Dockerfile           # currently builds from ./app
-└── ditdit/
-    ├── package.json     # newer Dit Dit app package
-    └── src/
-        ├── App.jsx      # current touch-first app shell
-        ├── main.jsx
-        └── styles.css
+├── src/                 # current touch-first app shell
+├── package.json
+├── Dockerfile
+└── vite.config.js
+
+legacy/
+└── app-prototype/       # archived earlier dashboard prototype
 ```
 
-The newer app is in:
+The active app is in:
 
 ```text
-app/ditdit/
+app/
 ```
 
-The older dashboard still exists in:
+The older dashboard was moved to:
 
 ```text
-app/src/
+legacy/app-prototype/
 ```
 
 ## Important Technical Gap
@@ -45,19 +43,7 @@ app/src/
 context: ./app
 ```
 
-That means the container currently targets the older top-level `app/` package unless the Docker setup is changed.
-
-Before continuing Pi/kiosk work, Codex should align the Docker and run commands with the intended app location:
-
-```text
-app/ditdit
-```
-
-Recommended next technical task:
-
-- Decide whether `app/ditdit` is the permanent app home.
-- If yes, update Docker build context and commands to use `app/ditdit`.
-- Keep the older `app/src` prototype only if it still has value; otherwise remove or archive it to avoid confusion.
+Docker and scripts now target top-level `app/`, which is the official app home.
 
 ## Current App Shell
 
@@ -117,14 +103,13 @@ Those belong after the app shell, kiosk launch, and project structure are stable
 
 ## Next Best Tasks
 
-1. Cleanly choose the app home: `app/ditdit` or top-level `app`.
-2. Update Docker and package commands to match that decision.
-3. Update README/AGENTS/docs so Codex knows where to work.
-4. Test the new app locally.
-5. Test the new app through Docker.
-6. Test on the Raspberry Pi touchscreen.
-7. Create a simple kiosk launcher script with cancel-to-desktop behavior.
-8. Then begin the first real Practice screen.
+1. Keep top-level `app/` as the only active Dit Dit app home.
+2. Keep `legacy/app-prototype/` as read-only reference unless intentionally revived.
+3. Test the app locally.
+4. Test the app through Docker.
+5. Test on the Raspberry Pi touchscreen.
+6. Continue kiosk launcher improvements (cancel-to-desktop behavior).
+7. Then begin the first real Practice screen.
 
 ## First Practice Screen Target
 
@@ -138,8 +123,7 @@ The first real practice screen should stay simple:
 
 ## Open Decisions
 
-- Should the project keep the older `app/src` dashboard?
-- Should Docker build from `app/ditdit` directly?
-- Should the kiosk launcher live in `scripts/`, `app/ditdit/scripts/`, or a future `deploy/pi/` folder?
+- Should the project eventually remove `legacy/app-prototype/` entirely or keep it as historical reference?
+- Should the kiosk launcher remain in `deploy/pi/` or move to a dedicated runtime package later?
 - Should the app name be `Dit Dit`, `Dit Dit Box`, or `Dit Dit CW Trainer` on the device home screen?
 - Should the exit flow only exit fullscreen browser, or should it stop the service and return to desktop?

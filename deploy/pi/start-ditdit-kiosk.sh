@@ -6,6 +6,8 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 COMPOSE_FILE="$PROJECT_ROOT/deploy/pi/docker-compose.yml"
 DITDIT_URL="${DITDIT_URL:-http://localhost:3000}"
 WAIT_SECONDS="${WAIT_SECONDS:-60}"
+DITDIT_CONTAINER_NAME="${DITDIT_CONTAINER_NAME:-ditdit}"
+DITDIT_BUILD_ON_START="${DITDIT_BUILD_ON_START:-0}"
 LOG_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/ditdit"
 CHROMIUM_LOG="$LOG_DIR/chromium.log"
 
@@ -33,9 +35,22 @@ start_ditdit() {
     exit 1
   fi
 
+  if [[ "$(docker inspect -f '{{.State.Running}}' "$DITDIT_CONTAINER_NAME" 2>/dev/null || true)" == "true" ]]; then
+    echo "Dit Dit container '$DITDIT_CONTAINER_NAME' is already running."
+    echo "Skipping Docker Compose startup."
+    return
+  fi
+
   echo "Project root: $PROJECT_ROOT"
   echo "Starting Dit Dit with Docker Compose..."
-  run_compose up -d --build
+
+  if [[ "$DITDIT_BUILD_ON_START" == "1" ]]; then
+    echo "DITDIT_BUILD_ON_START=1, forcing image rebuild before start."
+    run_compose up -d --build
+    return
+  fi
+
+  run_compose up -d
 }
 
 find_chromium() {

@@ -1,8 +1,8 @@
 services:
-  ditditbox:
+  ditdit:
     build:
       context: ./app
-    container_name: ditditbox
+    container_name: ditdit
     restart: unless-stopped
     ports:
       - "8080:80"

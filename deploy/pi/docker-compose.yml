@@ -1,7 +1,7 @@
 services:
   ditdit:
     build:
-      context: ../../app/ditdit
+      context: ../../app
       dockerfile: Dockerfile
     container_name: ditdit
     restart: unless-stopped

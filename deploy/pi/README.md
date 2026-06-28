@@ -14,7 +14,7 @@ npm run ditdit:build
 npm run ditdit:kiosk
 ```
 
-The root `package.json` only delegates into `app/ditdit`; it does not move the app.
+The root `package.json` only delegates into `app`; it does not move the app.
 
 ## Files
 
@@ -49,6 +49,12 @@ docker compose version
 From the repository root:
 
 ```bash
+docker compose -f deploy/pi/docker-compose.yml up -d
+```
+
+Force a rebuild only when needed:
+
+```bash
 docker compose -f deploy/pi/docker-compose.yml up -d --build
 ```
 
@@ -70,10 +76,17 @@ deploy/pi/start-ditdit-kiosk.sh
 
 The script:
 
-- Starts the Docker Compose app.
+- Reuses the running `ditdit` container when already up (fast path).
+- Starts the Docker Compose app when needed.
 - Waits until `http://localhost:3000` responds.
 - Finds Chromium on the host.
 - Launches Chromium in kiosk mode pointed at Dit Dit.
+
+To force an image rebuild on launch, set:
+
+```bash
+DITDIT_BUILD_ON_START=1 deploy/pi/start-ditdit-kiosk.sh
+```
 
 Chromium must run on the Pi desktop session. Do not run this script from a headless SSH-only session unless the desktop display environment is already available.
 
@@ -100,7 +113,7 @@ From the repository root on the Pi:
 bash deploy/pi/install-desktop-shortcut.sh
 ```
 
-This copies `deploy/pi/DitDit.desktop` to `~/Desktop/DitDit.desktop`, makes the launcher executable, and tries to mark the shortcut trusted. Use that shortcut from the Pi desktop session to start Docker Compose and launch Chromium kiosk mode.
+This copies `deploy/pi/DitDit.desktop` to `~/Desktop/DitDit.desktop`, rewrites the shortcut `Exec=` path to the current checkout's launcher script, makes the launcher executable, and tries to mark the shortcut trusted. Use that shortcut from the Pi desktop session to start Docker Compose and launch Chromium kiosk mode.
 
 Some Raspberry Pi desktop environments may ask you to trust or allow the launcher the first time you click it.
 

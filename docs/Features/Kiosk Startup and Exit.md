@@ -1,6 +1,6 @@
 # Kiosk Startup and Exit
 
-Last Updated: June 26, 2026
+Last Updated: June 28, 2026
 
 ## Feature Goal
 
@@ -26,7 +26,7 @@ Target Raspberry Pi boot behavior:
 
 ## In-App Exit Flow
 
-The app already has an `Exit to Desktop` button in the new `app/ditdit` interface.
+The app already has an `Exit to Desktop` button in the current `app` interface.
 
 Current behavior:
 
@@ -83,10 +83,10 @@ Acceptable recovery options:
 
 ## Codex Guidance
 
-Do not wire irreversible autostart behavior until the Docker/app folder mismatch is resolved.
+Do not wire irreversible autostart behavior until desktop recovery options are validated.
 
-Before building this feature, align the project around the intended app home:
+Current app home:
 
 ```text
-app/ditdit/
+app/
 ```
