@@ -1,35 +1,31 @@
+import { useEffect } from 'react'
 import TouchButton from '../components/TouchButton.jsx'
+import { saveSessionResult } from '../progress.js'
 
-export default function ResultsScreen({ data, onPracticeAgain, onHome }) {
-  const { results, mode, played } = data
+const MODE_LABELS = {
+  identify: 'Listen & Identify',
+  listen: 'Listen Only',
+}
+
+export default function ResultsScreen({ data, onPracticeAgain, onPracticeMissed, onHome }) {
+  useEffect(() => {
+    if (data?.id) {
+      saveSessionResult(data)
+    }
+  }, [data?.id, data])
+
+  const {
+    lessonName,
+    mode,
+    sessionLength,
+    attempted,
+    correct,
+    accuracy,
+    missed = [],
+  } = data
   const isIdentify = mode === 'identify'
-
-  if (!isIdentify) {
-    return (
-      <section className="screen results-screen" aria-labelledby="results-title">
-        <div className="screen-header">
-          <p className="screen-kicker">Dit Dit</p>
-        </div>
-
-        <h1 id="results-title" className="screen-title">Session Complete</h1>
-
-        <div className="results-card">
-          <p className="score-main">You listened to {played} character{played !== 1 ? 's' : ''}.</p>
-        </div>
-
-        <div className="results-actions">
-          <TouchButton onClick={onPracticeAgain}>Practice Again</TouchButton>
-          <TouchButton variant="secondary" onClick={onHome}>Back to Home</TouchButton>
-        </div>
-      </section>
-    )
-  }
-
-  const correct = results.filter(r => r.correct).length
-  const total = results.length
-  const pct = total > 0 ? Math.round((correct / total) * 100) : 0
-  const missedSet = new Set(results.filter(r => !r.correct).map(r => r.char))
-  const missed = [...missedSet]
+  const hasMisses = isIdentify && missed.length > 0
+  const completionCount = isIdentify ? attempted : sessionLength
 
   return (
     <section className="screen results-screen" aria-labelledby="results-title">
@@ -39,19 +35,53 @@ export default function ResultsScreen({ data, onPracticeAgain, onHome }) {
 
       <h1 id="results-title" className="screen-title">Results</h1>
 
-      <div className="results-card">
-        <p className="score-main">You got {correct} of {total} correct.</p>
-        <p className="score-pct" aria-label={`${pct} percent`}>{pct}%</p>
-        {missed.length > 0 ? (
-          <p className="missed-chars">Missed: {missed.join(', ')}</p>
-        ) : (
-          <p className="missed-chars all-correct">All correct! 🎉</p>
-        )}
-      </div>
+      <div className="results-content">
+        <section className="results-card" aria-labelledby="results-overview-title">
+          <p id="results-overview-title" className="section-kicker">At a Glance</p>
+          <p className="score-main">{lessonName}</p>
+          <div className="results-overview-grid">
+            <div className="mini-stat">
+              <span className="mini-stat-label">Mode</span>
+              <span className="mini-stat-value">{MODE_LABELS[mode] ?? MODE_LABELS.identify}</span>
+            </div>
+            <div className="mini-stat">
+              <span className="mini-stat-label">{isIdentify ? 'Correct' : 'Reps'}</span>
+              <span className="mini-stat-value">
+                {isIdentify ? `${correct} / ${attempted}` : completionCount}
+              </span>
+            </div>
+            <div className="mini-stat">
+              <span className="mini-stat-label">{isIdentify ? 'Accuracy' : 'Tracking'}</span>
+              <span className="mini-stat-value">{isIdentify ? `${accuracy}%` : 'Not scored'}</span>
+            </div>
+          </div>
+        </section>
 
-      <div className="results-actions">
-        <TouchButton onClick={onPracticeAgain}>Practice Again</TouchButton>
-        <TouchButton variant="secondary" onClick={onHome}>Back to Home</TouchButton>
+        <section className="results-card" aria-labelledby="missed-title">
+          <p id="missed-title" className="section-kicker">Missed Characters</p>
+          {hasMisses ? (
+            <div className="character-chip-row" aria-label="Missed characters">
+              {missed.map(character => (
+                <span key={character} className="character-chip character-chip-emphasis">
+                  {character}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p className="missed-chars all-correct">
+              {isIdentify ? 'Nice work. No missed characters this round.' : 'Listen-only session complete.'}
+            </p>
+          )}
+        </section>
+
+        <section className="results-actions" aria-labelledby="next-actions-title">
+          <p id="next-actions-title" className="section-kicker">Next Actions</p>
+          <TouchButton onClick={onPracticeAgain}>Practice Again</TouchButton>
+          {hasMisses && (
+            <TouchButton onClick={onPracticeMissed}>Practice Missed Characters</TouchButton>
+          )}
+          <TouchButton variant="secondary" onClick={onHome}>Home</TouchButton>
+        </section>
       </div>
     </section>
   )

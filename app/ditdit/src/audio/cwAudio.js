@@ -29,8 +29,7 @@ export async function playCharacter(char, { wpm = 20, frequency = 600, volume = 
   }
 
   const gainLevel = Math.max(0, Math.min(1, volume / 100))
-  // Standard Morse timing: 1 unit = 1200 ms / wpm
-  const unit = 1.2 / wpm
+  const unit = getMorseUnitSeconds(wpm)
   // Short ramp to prevent clicks; clamp to 10% of a dit duration
   const ramp = Math.min(0.005, unit * 0.1)
 
@@ -74,4 +73,16 @@ export async function playCharacter(char, { wpm = 20, frequency = 600, volume = 
       resolve()
     }
   })
+}
+
+export function getMorseUnitSeconds(wpm = 20) {
+  return 1.2 / Math.max(5, wpm)
+}
+
+export function getPostCharacterDelayMs({ wpm = 20, farnsworth = wpm } = {}) {
+  if (farnsworth >= wpm) return Math.round(getMorseUnitSeconds(wpm) * 3000)
+
+  const normalGapSeconds = getMorseUnitSeconds(wpm) * 3
+  const farnsworthGapSeconds = getMorseUnitSeconds(farnsworth) * 3
+  return Math.round(Math.max(normalGapSeconds, farnsworthGapSeconds) * 1000)
 }

@@ -13,6 +13,8 @@ export default function PracticeSetupScreen({ onBack, onStart }) {
   const [mode, setMode] = useState('identify')
   const [lessonId, setLessonId] = useState(LESSONS[0].id)
   const [length, setLength] = useState(10)
+  const selectedLesson = LESSONS.find(lesson => lesson.id === lessonId) ?? LESSONS[0]
+  const selectedMode = MODES.find(item => item.id === mode)
 
   return (
     <section className="screen" aria-labelledby="setup-title">
@@ -56,6 +58,21 @@ export default function PracticeSetupScreen({ onBack, onStart }) {
           </div>
         </fieldset>
 
+        <div className="selection-card" aria-live="polite">
+          <p className="selection-card-kicker">Current Selection</p>
+          <p className="selection-card-title">{selectedLesson?.name ?? 'Character Set'}</p>
+          <p className="selection-card-meta">
+            {selectedMode?.label ?? 'Listen & Identify'} · {length} items
+          </p>
+          <div className="character-chip-row" aria-label="Selected characters">
+            {(selectedLesson?.characters ?? []).map(character => (
+              <span key={character} className="character-chip">
+                {character}
+              </span>
+            ))}
+          </div>
+        </div>
+
         <fieldset className="setup-field">
           <legend className="setup-legend">Session Length</legend>
           <div className="option-group option-group-sm">
@@ -74,7 +91,14 @@ export default function PracticeSetupScreen({ onBack, onStart }) {
       </div>
 
       <div className="setup-actions">
-        <TouchButton onClick={() => onStart({ mode, lessonId, length })}>
+        <TouchButton onClick={() => onStart({
+          mode,
+          lessonId,
+          lessonName: selectedLesson?.name ?? 'Character Set',
+          characters: selectedLesson?.characters ?? [],
+          length,
+        })}
+        >
           Start
         </TouchButton>
       </div>

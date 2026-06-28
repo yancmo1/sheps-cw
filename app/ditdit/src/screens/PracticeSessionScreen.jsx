@@ -1,7 +1,18 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import TouchButton from '../components/TouchButton.jsx'
-import { getLessonById } from '../data/lessons.js'
-import { playCharacter } from '../audio/cwAudio.js'
+import { LESSONS, getLessonById } from '../data/lessons.js'
+import { getPostCharacterDelayMs, playCharacter } from '../audio/cwAudio.js'
+
+const MODE_LABELS = {
+  identify: 'Listen & Identify',
+  listen: 'Listen Only',
+}
+
+function wait(ms) {
+  return new Promise(resolve => {
+    window.setTimeout(resolve, ms)
+  })
+}
 
 function shuffle(arr) {
   const a = [...arr]
@@ -12,30 +23,57 @@ function shuffle(arr) {
   return a
 }
 
-function buildItems(lesson, length) {
-  const chars = lesson.characters
+function buildChoices(char, availableChars, fallbackChars) {
+  const pool = [...new Set([...availableChars, ...fallbackChars])]
+  const distractors = shuffle(pool.filter(candidate => candidate !== char)).slice(0, 3)
+  return shuffle([char, ...distractors])
+}
+
+function buildItems(characters, length) {
+  if (!Array.isArray(characters) || characters.length === 0 || length <= 0) {
+    return []
+  }
+
+  const fallbackChars = [...new Set(LESSONS.flatMap(lesson => lesson.characters))]
+
   return Array.from({ length }, () => {
-    const char = chars[Math.floor(Math.random() * chars.length)]
-    const others = shuffle(chars.filter(c => c !== char))
-    // Up to 4 choices total (may be fewer for tiny character sets)
-    const choices = shuffle([char, ...others.slice(0, 3)])
-    return { char, choices }
+    const char = characters[Math.floor(Math.random() * characters.length)]
+    return {
+      char,
+      choices: buildChoices(char, characters, fallbackChars),
+    }
   })
 }
 
+function createSessionId() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+
+  return `session-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`
+}
+
 export default function PracticeSessionScreen({ config, settings, onFinish }) {
-  const lesson = getLessonById(config.lessonId)
+  const lesson = useMemo(() => {
+    if (Array.isArray(config.characters) && config.characters.length > 0) {
+      return {
+        id: config.lessonId ?? 'custom',
+        name: config.lessonName ?? 'Custom Set',
+        characters: config.characters,
+      }
+    }
+
+    return getLessonById(config.lessonId)
+  }, [config.characters, config.lessonId, config.lessonName])
+  const characters = lesson?.characters ?? []
   const isIdentify = config.mode === 'identify'
+  const modeLabel = MODE_LABELS[config.mode] ?? MODE_LABELS.identify
 
-  // Built once on mount
-  const [items] = useState(() => buildItems(lesson, config.length))
+  const [items] = useState(() => buildItems(characters, config.length))
   const [index, setIndex] = useState(0)
-
-  // 'playing' | 'answering' | 'feedback' | 'revealed'
   const [phase, setPhase] = useState('playing')
   const [selected, setSelected] = useState(null)
 
-  // Stable refs that avoid stale-closure issues
   const settingsRef = useRef(settings)
   useEffect(() => { settingsRef.current = settings }, [settings])
 
@@ -47,16 +85,17 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
     return () => { mountedRef.current = false }
   }, [])
 
-  // Play the character whenever the index advances (or on initial mount)
   useEffect(() => {
     let stale = false
 
     async function play() {
-      if (playingRef.current) return
+      if (items.length === 0 || playingRef.current) return
+
       playingRef.current = true
       setPhase('playing')
       try {
         await playCharacter(items[index].char, settingsRef.current)
+        await wait(getPostCharacterDelayMs(settingsRef.current))
       } finally {
         playingRef.current = false
         if (!stale && mountedRef.current) {
@@ -68,17 +107,17 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
     play()
 
     return () => { stale = true }
-    // Only re-run when the item index changes; settings changes don't re-trigger
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [index])
+  }, [index, isIdentify, items])
 
   async function handlePlayAgain() {
-    if (playingRef.current) return
+    if (items.length === 0 || playingRef.current) return
+
     playingRef.current = true
     const resumePhase = phase
     setPhase('playing')
     try {
       await playCharacter(items[index].char, settingsRef.current)
+      await wait(getPostCharacterDelayMs(settingsRef.current))
     } finally {
       playingRef.current = false
       if (mountedRef.current) {
@@ -87,32 +126,98 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
     }
   }
 
+  function recordListenOnlyItem() {
+    const item = items[index]
+    if (!item) return
+
+    const alreadyRecorded = resultsRef.current.length > index
+    if (alreadyRecorded) return
+
+    resultsRef.current = [
+      ...resultsRef.current,
+      { character: item.char, selected: null, correct: null },
+    ]
+  }
+
   function handleAnswer(choice) {
     if (phase !== 'answering') return
-    const correct = choice === items[index].char
-    resultsRef.current = [...resultsRef.current, { char: items[index].char, correct }]
+
+    const currentItem = items[index]
+    const correct = choice === currentItem.char
+
+    resultsRef.current = [
+      ...resultsRef.current,
+      { character: currentItem.char, selected: choice, correct },
+    ]
     setSelected(choice)
     setPhase('feedback')
   }
 
+  function finish() {
+    if (!isIdentify && phase === 'revealed') {
+      recordListenOnlyItem()
+    }
+
+    const completedItems = resultsRef.current
+    const attempted = completedItems.length
+    const correct = completedItems.filter(item => item.correct === true).length
+    const accuracy = attempted > 0 ? Math.round((correct / attempted) * 100) : 0
+    const missed = [...new Set(
+      completedItems
+        .filter(item => item.correct === false)
+        .map(item => item.character)
+    )]
+
+    onFinish({
+      id: createSessionId(),
+      createdAt: new Date().toISOString(),
+      lessonId: lesson?.id ?? 'custom',
+      lessonName: config.lessonName ?? lesson?.name ?? 'Custom Set',
+      mode: config.mode,
+      sessionLength: config.length,
+      attempted,
+      correct,
+      accuracy,
+      missed,
+      items: completedItems,
+      characters,
+    })
+  }
+
   function handleNext() {
+    if (!isIdentify) {
+      recordListenOnlyItem()
+    }
+
     const nextIndex = index + 1
     if (nextIndex >= items.length) {
       finish()
-    } else {
-      setSelected(null)
-      setIndex(nextIndex)
+      return
     }
+
+    setSelected(null)
+    setIndex(nextIndex)
   }
 
-  function finish() {
-    onFinish({
-      mode: config.mode,
-      lessonId: config.lessonId,
-      length: config.length,
-      results: resultsRef.current,
-      played: resultsRef.current.length,
-    })
+  if (!lesson || items.length === 0) {
+    return (
+      <section className="screen session-screen" aria-labelledby="session-title">
+        <div className="screen-header">
+          <p className="screen-kicker">Dit Dit</p>
+        </div>
+
+        <h1 id="session-title" className="screen-title">Practice Session</h1>
+
+        <div className="results-card">
+          <p className="score-main">No characters are available for this practice set.</p>
+          <p className="missed-chars">Return home and choose a different lesson.</p>
+        </div>
+
+        <div className="results-actions">
+          <TouchButton variant="secondary" onClick={finish}>End Session</TouchButton>
+        </div>
+      </section>
+    )
   }
 
   const item = items[index]
@@ -120,28 +225,34 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
   const canPlayAgain = phase !== 'playing'
   const showFeedback = phase === 'feedback' || phase === 'revealed'
   const isCorrect = selected === item.char
+  const sessionLabel = config.customLabel ?? lesson.name
 
   return (
     <section className="screen session-screen" aria-labelledby="session-title">
-      {/* Top bar: progress + end */}
       <div className="session-top">
-        <p className="session-progress" aria-live="polite">
-          {index + 1} <span className="session-progress-of">of</span> {items.length}
-        </p>
+        <div className="session-meta">
+          <p className="session-progress" aria-live="polite">
+            {index + 1} <span className="session-progress-of">of</span> {items.length}
+          </p>
+          <p className="session-label">{modeLabel}</p>
+          <p className="session-subtitle">{sessionLabel}</p>
+          {config.sourceLessonName && (
+            <p className="session-source">From {config.sourceLessonName}</p>
+          )}
+        </div>
         <button type="button" className="end-btn" onClick={finish}>
-          End
+          End Session
         </button>
       </div>
 
-      {/* Character display */}
+      <h1 id="session-title" className="screen-title session-title">Practice Session</h1>
+
       <div className="char-display" aria-live="polite" aria-label="Character">
         {phase === 'revealed' || phase === 'feedback'
           ? <span className="char-revealed">{item.char}</span>
-          : <span className="char-hidden">?</span>
-        }
+          : <span className="char-hidden">?</span>}
       </div>
 
-      {/* Play Again */}
       <div className="play-again-row">
         <TouchButton
           variant="secondary"
@@ -153,7 +264,6 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
         </TouchButton>
       </div>
 
-      {/* Answer choices (identify mode only) */}
       {isIdentify && (
         <div className="answer-grid" role="group" aria-label="Answer choices">
           {item.choices.map(choice => {
@@ -162,6 +272,7 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
               if (choice === item.char) state = 'correct'
               else if (choice === selected) state = 'wrong'
             }
+
             return (
               <button
                 key={choice}
@@ -177,13 +288,15 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
         </div>
       )}
 
-      {/* Feedback + Next */}
       {showFeedback && (
         <div className="session-feedback">
           {isIdentify && (
             <p className={`feedback-text ${isCorrect ? 'feedback-correct' : 'feedback-wrong'}`}>
               {isCorrect ? '✓ Correct!' : `✗ Answer: ${item.char}`}
             </p>
+          )}
+          {!isIdentify && (
+            <p className="feedback-text">Listen again or continue when you are ready.</p>
           )}
           <TouchButton onClick={handleNext}>
             {isLastItem ? 'See Results' : 'Next →'}
