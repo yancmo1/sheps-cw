@@ -7,6 +7,8 @@ LAUNCHER="$REPO_ROOT/deploy/pi/start-ditdit-kiosk.sh"
 SOURCE_DESKTOP_FILE="$REPO_ROOT/deploy/pi/DitDit.desktop"
 DESKTOP_DIR="${XDG_DESKTOP_DIR:-$HOME/Desktop}"
 TARGET_DESKTOP_FILE="$DESKTOP_DIR/DitDit.desktop"
+LIBFM_CONFIG_DIR="$HOME/.config/libfm"
+LIBFM_CONFIG_FILE="$LIBFM_CONFIG_DIR/libfm.conf"
 
 if [[ ! -f "$SOURCE_DESKTOP_FILE" ]]; then
   echo "Desktop shortcut template was not found at $SOURCE_DESKTOP_FILE." >&2
@@ -38,6 +40,22 @@ awk -v launcher="$LAUNCHER" '
 mv "$TARGET_DESKTOP_FILE.tmp" "$TARGET_DESKTOP_FILE"
 
 chmod +x "$TARGET_DESKTOP_FILE"
+
+echo "Configuring file manager execute behavior..."
+mkdir -p "$LIBFM_CONFIG_DIR"
+
+if [[ -f "$LIBFM_CONFIG_FILE" ]]; then
+  if grep -q '^quick_exec=' "$LIBFM_CONFIG_FILE"; then
+    sed -i 's/^quick_exec=.*/quick_exec=1/' "$LIBFM_CONFIG_FILE"
+  else
+    printf '\nquick_exec=1\n' >> "$LIBFM_CONFIG_FILE"
+  fi
+else
+  cat > "$LIBFM_CONFIG_FILE" <<'EOF'
+[config]
+quick_exec=1
+EOF
+fi
 
 if command -v gio >/dev/null 2>&1; then
   echo "Marking desktop shortcut trusted, if supported..."

@@ -113,7 +113,7 @@ From the repository root on the Pi:
 bash deploy/pi/install-desktop-shortcut.sh
 ```
 
-This copies `deploy/pi/DitDit.desktop` to `~/Desktop/DitDit.desktop`, rewrites the shortcut `Exec=` path to the current checkout's launcher script, makes the launcher executable, and tries to mark the shortcut trusted. Use that shortcut from the Pi desktop session to start Docker Compose and launch Chromium kiosk mode.
+This copies `deploy/pi/DitDit.desktop` to `~/Desktop/DitDit.desktop`, rewrites the shortcut `Exec=` path to the current checkout's launcher script, makes the launcher executable, sets `quick_exec=1` in `~/.config/libfm/libfm.conf`, and tries to mark the shortcut trusted. Use that shortcut from the Pi desktop session to start Docker Compose and launch Chromium kiosk mode.
 
 Some Raspberry Pi desktop environments may ask you to trust or allow the launcher the first time you click it.
 
@@ -122,6 +122,7 @@ If the desktop shows a popup asking `Execute`, `Execute in Terminal`, or `Open`,
 ```bash
 chmod +x ~/Desktop/DitDit.desktop
 gio set ~/Desktop/DitDit.desktop metadata::trusted true
+sed -i 's/^quick_exec=.*/quick_exec=1/' ~/.config/libfm/libfm.conf
 ```
 
 Some Raspberry Pi desktop environments may still require right-clicking the icon and marking it trusted manually.
