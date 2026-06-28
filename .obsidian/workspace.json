@@ -4,31 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "04a56e4946d16d95",
+        "id": "a1b1da05da379e5b",
         "type": "tabs",
         "children": [
           {
-            "id": "14af50b8502c4f92",
+            "id": "3ff2dd2882e1d76b",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "docs/Daily Notes/June 27, 2026.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "June 27, 2026"
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
             }
           }
         ]
@@ -195,19 +181,33 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "14af50b8502c4f92",
+  "active": "3ff2dd2882e1d76b",
   "lastOpenFiles": [
-    "app/ditdit/dist/assets/index-BGNL7eKP.css",
-    "app/ditdit/dist/assets/index-Dwo1q1Sx.js",
-    "deploy/pi/DitDit.desktop",
-    "package.json",
-    "app/ditdit/src/settings.js",
-    "app/ditdit/src/screens/SettingsScreen.jsx",
-    "app/ditdit/src/screens/ResultsScreen.jsx",
-    "app/ditdit/src/screens/ProgressScreen.jsx",
-    "app/ditdit/src/screens/PracticeSetupScreen.jsx",
-    "app/ditdit/src/screens/PracticeSessionScreen.jsx",
-    "app/ditdit/src/screens/HomeScreen.jsx",
+    "app/node_modules/fdir/README.md",
+    "docs/Project Overview.md",
+    "Daily Notes.md",
+    "AGENTS.md",
+    "README.md",
+    "docs/Daily Notes/June 27, 2026.md",
+    "docs/Daily Notes/June 26, 2026.md",
+    "app/node_modules/nanoid/README.md",
+    "app/dist/assets/index-BGNL7eKP.css",
+    "app/dist/assets/index-Dwo1q1Sx.js",
+    "app/vite.config.js",
+    "app/src/screens/SettingsScreen.jsx",
+    "app/src/screens/ResultsScreen.jsx",
+    "app/src/screens/ProgressScreen.jsx",
+    "app/src/screens/PracticeSetupScreen.jsx",
+    "app/src/screens/PracticeSessionScreen.jsx",
+    "app/src/screens/HomeScreen.jsx",
+    "app/src/screens/ExitScreen.jsx",
+    "app/README.md",
+    "legacy/app-prototype/src/assets/vite.svg",
+    "legacy/app-prototype/src/assets/react.svg",
+    "legacy/app-prototype/src/assets/hero.png",
+    "legacy/app-prototype/public/icons.svg",
+    "legacy/app-prototype/public/favicon.svg",
+    "legacy/app-prototype/README.md",
     "docs/Features/Kiosk Startup and Exit.md",
     "docs/Architecture/Current App Structure.md",
     "deploy/pi/README.md",
@@ -224,15 +224,6 @@
     "app/ditdit/node_modules/picomatch/README.md",
     "app/ditdit/node_modules/detect-libc/README.md",
     "app/ditdit/node_modules/@vitejs/plugin-react/README.md",
-    "app/ditdit/node_modules/fdir/README.md",
-    "app/ditdit/node_modules/tinyglobby/README.md",
-    "app/ditdit/node_modules/rolldown/README.md",
-    "app/ditdit/node_modules/lightningcss-darwin-arm64/README.md",
-    "app/ditdit/node_modules/picocolors/README.md",
-    "app/ditdit/node_modules/@rolldown/pluginutils/README.md",
-    "app/ditdit/node_modules/@rolldown/binding-darwin-arm64/README.md",
-    "app/ditdit/node_modules/@oxc-project/types/README.md",
-    "docs/Features/Boot up.md",
     "app/dist/icons.svg",
     "app/dist/favicon.svg",
     "Projects/CW Trainer/Untitled.canvas"

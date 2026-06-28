@@ -1,3 +1,22 @@
 {
-  "alwaysUpdateLinks": true
+  "alwaysUpdateLinks": true,
+  "userIgnoreFilters": [
+    ".git",
+    "node_modules/",
+    "app/ditdit/node_modules/",
+    "app/ditdit/dist/",
+    "app/ditdit/build/",
+    "app/ditdit/.next/",
+    "app/ditdit/.vite/",
+    "app/ditdit/coverage/",
+    "app/ditdit/package-lock.json",
+    "app/ditdit/pnpm-lock.yaml",
+    "app/ditdit/yarn.lock",
+    ".DS_Store",
+    ".env",
+    ".env.local",
+    ".vscode/",
+    "app/ditdit/node_modules/",
+    "app/node_modules/nanoid/README"
+  ]
 }
