@@ -4,6 +4,18 @@ This folder contains the Raspberry Pi proof-of-life deployment for Dit Dit.
 
 The React/Vite app is built into static files and served by nginx in Docker. Chromium is not containerized. The Pi desktop session launches Chromium kiosk mode and points it at the containerized app on `http://localhost:3000`.
 
+## Root Helper Commands
+
+From the repository root:
+
+```bash
+npm run ditdit:install
+npm run ditdit:build
+npm run ditdit:kiosk
+```
+
+The root `package.json` only delegates into `app/ditdit`; it does not move the app.
+
 ## Files
 
 - `docker-compose.yml` builds and runs the Dit Dit web container.
@@ -85,12 +97,21 @@ DITDIT_URL=http://localhost:3000 WAIT_SECONDS=90 deploy/pi/start-ditdit-kiosk.sh
 From the repository root on the Pi:
 
 ```bash
-deploy/pi/install-desktop-shortcut.sh
+bash deploy/pi/install-desktop-shortcut.sh
 ```
 
-This creates a `Dit Dit` launcher on the Pi desktop and in the local applications menu. Use that shortcut from the Pi desktop session to start Docker Compose and launch Chromium kiosk mode.
+This copies `deploy/pi/DitDit.desktop` to `~/Desktop/DitDit.desktop`, makes the launcher executable, and tries to mark the shortcut trusted. Use that shortcut from the Pi desktop session to start Docker Compose and launch Chromium kiosk mode.
 
 Some Raspberry Pi desktop environments may ask you to trust or allow the launcher the first time you click it.
+
+If the desktop shows a popup asking `Execute`, `Execute in Terminal`, or `Open`, run:
+
+```bash
+chmod +x ~/Desktop/DitDit.desktop
+gio set ~/Desktop/DitDit.desktop metadata::trusted true
+```
+
+Some Raspberry Pi desktop environments may still require right-clicking the icon and marking it trusted manually.
 
 The shortcut runs without opening a terminal window. Chromium output is written to:
 

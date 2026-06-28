@@ -1,0 +1,11 @@
+{
+  "name": "ditditbox",
+  "private": true,
+  "scripts": {
+    "ditdit:install": "npm --prefix app/ditdit install",
+    "ditdit:dev": "npm --prefix app/ditdit run dev -- --host 0.0.0.0",
+    "ditdit:build": "npm --prefix app/ditdit run build",
+    "ditdit:preview": "npm --prefix app/ditdit run preview -- --host 0.0.0.0",
+    "ditdit:kiosk": "bash deploy/pi/start-ditdit-kiosk.sh"
+  }
+}

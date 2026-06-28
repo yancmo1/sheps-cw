@@ -2,11 +2,14 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-COMPOSE_FILE="$SCRIPT_DIR/docker-compose.yml"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+COMPOSE_FILE="$PROJECT_ROOT/deploy/pi/docker-compose.yml"
 DITDIT_URL="${DITDIT_URL:-http://localhost:3000}"
 WAIT_SECONDS="${WAIT_SECONDS:-60}"
 LOG_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/ditdit"
 CHROMIUM_LOG="$LOG_DIR/chromium.log"
+
+cd "$PROJECT_ROOT"
 
 run_compose() {
   if docker compose version >/dev/null 2>&1; then
@@ -23,8 +26,20 @@ run_compose() {
   exit 1
 }
 
+start_ditdit() {
+  if [[ ! -f "$COMPOSE_FILE" ]]; then
+    echo "Docker Compose file was not found at $COMPOSE_FILE." >&2
+    echo "Cannot start Dit Dit kiosk mode without the Pi Compose file." >&2
+    exit 1
+  fi
+
+  echo "Project root: $PROJECT_ROOT"
+  echo "Starting Dit Dit with Docker Compose..."
+  run_compose up -d --build
+}
+
 find_chromium() {
-  for command_name in chromium-browser chromium google-chrome google-chrome-stable; do
+  for command_name in chromium-browser chromium; do
     if command -v "$command_name" >/dev/null 2>&1; then
       echo "$command_name"
       return
@@ -84,11 +99,12 @@ wait_for_ditdit() {
   done
 
   echo "Dit Dit did not respond at $DITDIT_URL after $WAIT_SECONDS seconds." >&2
+  echo "Check the Docker Compose service status below and retry after fixing the app startup." >&2
   run_compose ps >&2 || true
   exit 1
 }
 
-run_compose up -d --build
+start_ditdit
 wait_for_ditdit
 
 CHROMIUM="$(find_chromium)"
@@ -97,13 +113,16 @@ ensure_desktop_session
 mkdir -p "$LOG_DIR"
 export LIBGL_ALWAYS_SOFTWARE="${LIBGL_ALWAYS_SOFTWARE:-1}"
 
+echo "Launching Chromium kiosk mode with $CHROMIUM..."
+echo "Chromium log: $CHROMIUM_LOG"
+
 exec "$CHROMIUM" \
   --kiosk \
-  --start-fullscreen \
   --no-first-run \
   --noerrdialogs \
   --disable-infobars \
   --disable-session-crashed-bubble \
+  --disable-features=TranslateUI \
   --disable-gpu \
   --disable-gpu-compositing \
   --disable-gpu-rasterization \
@@ -114,5 +133,5 @@ exec "$CHROMIUM" \
   --overscroll-history-navigation=0 \
   --check-for-update-interval=31536000 \
   --touch-events=enabled \
-  --app="$DITDIT_URL" \
+  "$DITDIT_URL" \
   >"$CHROMIUM_LOG" 2>&1

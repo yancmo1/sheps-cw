@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Dit Dit
+Comment=Launch Dit Dit CW Trainer
+Exec=/opt/ditditbox/deploy/pi/start-ditdit-kiosk.sh
+Terminal=false
+Categories=Education;HamRadio;

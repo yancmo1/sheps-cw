@@ -4,42 +4,35 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 LAUNCHER="$REPO_ROOT/deploy/pi/start-ditdit-kiosk.sh"
+SOURCE_DESKTOP_FILE="$REPO_ROOT/deploy/pi/DitDit.desktop"
 DESKTOP_DIR="${XDG_DESKTOP_DIR:-$HOME/Desktop}"
-APPLICATIONS_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/applications"
-DESKTOP_FILE_NAME="ditdit-kiosk.desktop"
+TARGET_DESKTOP_FILE="$DESKTOP_DIR/DitDit.desktop"
 
-if [[ ! -x "$LAUNCHER" ]]; then
-  chmod +x "$LAUNCHER"
+if [[ ! -f "$SOURCE_DESKTOP_FILE" ]]; then
+  echo "Desktop shortcut template was not found at $SOURCE_DESKTOP_FILE." >&2
+  exit 1
 fi
 
-mkdir -p "$DESKTOP_DIR" "$APPLICATIONS_DIR"
+echo "Making launcher executable..."
+chmod +x "$LAUNCHER"
 
-write_desktop_file() {
-  local target="$1"
+echo "Installing desktop shortcut to $TARGET_DESKTOP_FILE..."
+mkdir -p "$DESKTOP_DIR"
+cp "$SOURCE_DESKTOP_FILE" "$TARGET_DESKTOP_FILE"
+chmod +x "$TARGET_DESKTOP_FILE"
 
-  cat > "$target" <<EOF
-[Desktop Entry]
-Type=Application
-Name=Dit Dit
-Comment=Start Dit Dit kiosk mode
-Exec=/usr/bin/env bash "$LAUNCHER"
-Path=$REPO_ROOT
-Terminal=false
-Categories=Education;
-StartupNotify=false
-EOF
-
-  chmod +x "$target"
-
-  if command -v gio >/dev/null 2>&1; then
-    gio set "$target" metadata::trusted true >/dev/null 2>&1 || true
+if command -v gio >/dev/null 2>&1; then
+  echo "Marking desktop shortcut trusted, if supported..."
+  if ! gio set "$TARGET_DESKTOP_FILE" metadata::trusted true >/dev/null 2>&1; then
+    echo "Could not mark the shortcut trusted automatically."
+    echo "If the desktop asks what to do, right-click the Dit Dit icon and choose a trust option such as \"Trust this executable\"."
   fi
-}
-
-write_desktop_file "$APPLICATIONS_DIR/$DESKTOP_FILE_NAME"
-write_desktop_file "$DESKTOP_DIR/$DESKTOP_FILE_NAME"
+else
+  echo "gio is not installed, so the shortcut could not be marked trusted automatically."
+  echo "If the desktop asks what to do, right-click the Dit Dit icon and choose a trust option such as \"Trust this executable\"."
+fi
 
 echo "Installed Dit Dit desktop shortcut:"
-echo "  $DESKTOP_DIR/$DESKTOP_FILE_NAME"
+echo "  $TARGET_DESKTOP_FILE"
 echo
 echo "Launch it from the Pi desktop session so Chromium can access the display."
