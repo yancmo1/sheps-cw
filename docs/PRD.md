@@ -53,6 +53,8 @@ http://localhost:3000
 
 The `ditditbox.service` name is acceptable because it refers to the Dit Dit Box appliance deployment, not just the React app.
 
+The root `docker-compose.local.yml` is separate from the Pi appliance path. It is a local/dev convenience file that serves the active app on host port `8080`.
+
 ## Current App Shell
 
 The new Dit Dit app currently provides:
@@ -114,7 +116,7 @@ Those belong after the app shell, kiosk launch, and project structure are stable
 1. Keep top-level `app/` as the only active Dit Dit app home.
 2. Keep `legacy/app-prototype/` as read-only reference unless intentionally revived.
 3. Test the app locally.
-4. Test the app through Docker.
+4. Test the app through local Docker with `docker-compose.local.yml`.
 5. Test on the Raspberry Pi touchscreen.
 6. Continue kiosk launcher improvements (cancel-to-desktop behavior).
 7. Continue extracting future core behavior out of the UI as the training engine becomes more concrete.

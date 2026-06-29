@@ -32,16 +32,15 @@ Current Dit Dit interface includes:
 
 ## Docker and Kiosk Alignment
 
-Both compose files now build from `app/`:
+There are two Compose files with different roles:
 
-```yaml
-context: ./app
-```
+- `docker-compose.local.yml` is a local/dev convenience file. It builds the active `app/` and serves it on host port `8080`.
+- `deploy/pi/docker-compose.yml` is the Dit Dit Box Pi appliance deployment. It builds the active `app/` and serves it at `127.0.0.1:3000` / `http://localhost:3000` for the Pi desktop and kiosk browser.
 
-and
+The Pi appliance scripts and service should continue to use:
 
-```yaml
-context: ../../app
+```text
+deploy/pi/docker-compose.yml
 ```
 
 ## Recommended Working Rule

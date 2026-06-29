@@ -77,7 +77,7 @@ Acceptable recovery options:
 ## Open Questions
 
 - Should the app run from local Vite during development or from Docker/nginx during kiosk testing?
-- Current Pi appliance deployment serves Dit Dit at `127.0.0.1:3000` / `http://localhost:3000`; should any separate local-development Docker path keep using another port?
+- Current Pi appliance deployment serves Dit Dit at `127.0.0.1:3000` / `http://localhost:3000`. The root `docker-compose.local.yml` is a separate local/dev convenience path that uses host port `8080`.
 - Should the launcher remain under `deploy/pi/` long term, or move to another runtime/deployment package later?
 - Should `Exit to Desktop` call a local helper endpoint, close the browser, or show instructions only?
 - Should the cancel window be 5 seconds, 10 seconds, or user-configurable?

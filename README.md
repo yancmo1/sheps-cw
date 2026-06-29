@@ -47,6 +47,7 @@ This allows the same engine to power:
 
 ```
 app/                    # canonical Dit Dit React/Vite app
+docker-compose.local.yml # local/dev Docker convenience for the active app
 deploy/pi/              # Pi service, compose, launcher, desktop scripts
 docs/                   # planning and architecture notes
 legacy/app-prototype/   # archived earlier dashboard prototype
@@ -121,6 +122,15 @@ npm run pi:stop
 npm run pi:logs
 npm run pi:kiosk
 ```
+
+Local Docker convenience:
+
+```bash
+docker compose -f docker-compose.local.yml up -d --build
+docker compose -f docker-compose.local.yml down
+```
+
+The root `docker-compose.local.yml` is for local/dev convenience and serves the active app on host port `8080`. The Pi appliance deployment uses `deploy/pi/docker-compose.yml` and serves Dit Dit Box at `http://localhost:3000`.
 
 Pi appliance install path expectation:
 
