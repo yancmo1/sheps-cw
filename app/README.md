@@ -1,8 +1,10 @@
 # Dit Dit
 
-Dit Dit is the first local app shell for a Raspberry Pi touchscreen Morse/CW trainer. This milestone creates the appliance-style home screen, touch-friendly navigation, and placeholder screens that future training features can build on.
+Dit Dit is the React/Vite CW trainer app and product for the Sheps CW project. The active application lives in this `app/` directory.
 
-No Morse engine, audio, hardware input, backend, authentication, or kiosk launcher is included yet.
+Dit Dit Box is the Raspberry Pi appliance/kiosk deployment of Dit Dit. The Pi deployment layer lives in `deploy/pi/`, where Docker Compose, systemd, desktop shortcut, and Chromium kiosk launcher assets are maintained.
+
+The app currently includes the touch-first training flow foundation, browser-based Morse audio, local settings persistence, local progress history, missed-character practice, and an exit-to-desktop flow foundation. Hardware input, GPIO integration, backend services, authentication, and a reusable core Morse engine are not included yet.
 
 ## Local Development With NPM
 
@@ -56,7 +58,7 @@ docker compose -f deploy/pi/docker-compose.yml down
 
 ## Raspberry Pi Kiosk Launcher
 
-The helper script starts the Docker Compose service and launches Chromium kiosk mode on the Pi host:
+The Pi appliance/kiosk helper script starts or checks the Docker Compose service and launches Chromium kiosk mode on the Pi host:
 
 ```bash
 deploy/pi/start-ditdit-kiosk.sh
@@ -75,7 +77,7 @@ DITDIT_URL=http://localhost:3000 deploy/pi/start-ditdit-kiosk.sh
 - Initial target display is a 7-inch Raspberry Pi touchscreen at `1024x600`.
 - The interface uses large buttons and high-contrast text for finger input.
 - The app can be launched manually with npm during development or served through Docker Compose for Pi deployment.
-- Exit to Desktop is only a placeholder inside the web app. Real desktop exit behavior should be handled by the Raspberry Pi launcher layer.
+- Exit to Desktop attempts to close the browser window and falls back to user guidance if Chromium does not allow the web app to close itself. Deeper desktop/session control should remain in the Raspberry Pi launcher layer.
 
 ## Future TODO: Startup and Kiosk Flow
 
@@ -91,8 +93,8 @@ If not canceled, launch Dit Dit fullscreen
 
 The user should never feel trapped after reboot. A visible startup screen with a Cancel to Desktop option should exist before launching the app fullscreen.
 
-Likely future approaches:
+Likely future additions:
 
-- Desktop autostart script during early development
-- Chromium kiosk mode after the app shell is stable
-- systemd service later if Dit Dit becomes more appliance-like
+- Desktop autostart or a small pre-launch cancel prompt.
+- Additional Chromium kiosk hardening after real Pi testing.
+- More systemd/user-session polish if Dit Dit Box becomes more appliance-like.
