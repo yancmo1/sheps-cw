@@ -5,195 +5,140 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 COMPOSE_FILE="$PROJECT_ROOT/deploy/pi/docker-compose.yml"
 DITDIT_URL="${DITDIT_URL:-http://localhost:3000}"
-WAIT_SECONDS="${WAIT_SECONDS:-60}"
-DITDIT_CONTAINER_NAME="${DITDIT_CONTAINER_NAME:-ditdit}"
-DITDIT_BUILD_ON_START="${DITDIT_BUILD_ON_START:-0}"
-STARTUP_CANCEL_ENABLED="${STARTUP_CANCEL_ENABLED:-1}"
-STARTUP_CANCEL_SECONDS="${STARTUP_CANCEL_SECONDS:-10}"
-LOG_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/ditdit"
+WAIT_SECONDS="${WAIT_SECONDS:-20}"
+SERVICE_NAME="${DITDIT_SERVICE_NAME:-ditditbox.service}"
+LOG_DIR="/home/pi/.cache/ditdit"
 CHROMIUM_LOG="$LOG_DIR/chromium.log"
 
-cd "$PROJECT_ROOT"
+RUN_STARTED_AT="$(date +%s)"
+STEP_STARTED_AT="$RUN_STARTED_AT"
 
-run_compose() {
-  if docker compose version >/dev/null 2>&1; then
-    docker compose -f "$COMPOSE_FILE" "$@"
-    return
-  fi
+timestamp() {
+  date '+%Y-%m-%d %H:%M:%S'
+}
 
-  if command -v docker-compose >/dev/null 2>&1; then
-    docker-compose -f "$COMPOSE_FILE" "$@"
-    return
-  fi
+mark_step() {
+  local label="$1"
+  local now
+  now="$(date +%s)"
+  echo "[$(timestamp)] $label: $((now - STEP_STARTED_AT))s"
+  STEP_STARTED_AT="$now"
+}
 
-  echo "Docker Compose is required. Install the Docker Compose plugin or docker-compose." >&2
+fail() {
+  echo "[$(timestamp)] ERROR: $*" >&2
   exit 1
 }
 
-start_ditdit() {
+health_check() {
+  curl -fsS "$DITDIT_URL" >/dev/null 2>&1
+}
+
+run_compose() {
+  docker compose -f "$COMPOSE_FILE" "$@"
+}
+
+check_start_dependencies() {
   if [[ ! -f "$COMPOSE_FILE" ]]; then
-    echo "Docker Compose file was not found at $COMPOSE_FILE." >&2
-    echo "Cannot start Dit Dit kiosk mode without the Pi Compose file." >&2
-    exit 1
+    fail "Docker Compose file was not found at $COMPOSE_FILE."
   fi
 
-  if [[ "$(docker inspect -f '{{.State.Running}}' "$DITDIT_CONTAINER_NAME" 2>/dev/null || true)" == "true" ]]; then
-    echo "Dit Dit container '$DITDIT_CONTAINER_NAME' is already running."
-    echo "Skipping Docker Compose startup."
-    return
+  if ! command -v docker >/dev/null 2>&1; then
+    fail "Docker is required to start Dit Dit when the service is not already running."
   fi
 
-  echo "Project root: $PROJECT_ROOT"
-  echo "Starting Dit Dit with Docker Compose..."
+  if ! docker compose version >/dev/null 2>&1; then
+    fail "Docker Compose plugin is required. Confirm 'docker compose version' works."
+  fi
+}
 
-  if [[ "$DITDIT_BUILD_ON_START" == "1" ]]; then
-    echo "DITDIT_BUILD_ON_START=1, forcing image rebuild before start."
-    run_compose up -d --build
-    return
+start_service_or_container() {
+  echo "[$(timestamp)] Dit Dit is not responding; starting the app service without rebuilding..."
+
+  if command -v systemctl >/dev/null 2>&1 && systemctl cat "$SERVICE_NAME" >/dev/null 2>&1; then
+    if sudo systemctl start "$SERVICE_NAME"; then
+      mark_step "service/container start"
+      return
+    fi
+    echo "[$(timestamp)] systemd start failed; falling back to Docker Compose --no-build." >&2
+  else
+    echo "[$(timestamp)] $SERVICE_NAME is not installed; falling back to Docker Compose --no-build."
   fi
 
-  run_compose up -d
+  run_compose up -d --no-build
+  mark_step "service/container start"
+}
+
+wait_for_app() {
+  echo "[$(timestamp)] Waiting for Dit Dit at $DITDIT_URL..."
+  for _ in $(seq 1 "$WAIT_SECONDS"); do
+    if health_check; then
+      mark_step "wait for app"
+      return
+    fi
+    sleep 1
+  done
+
+  echo "[$(timestamp)] Dit Dit did not respond at $DITDIT_URL after ${WAIT_SECONDS}s." >&2
+  echo "[$(timestamp)] Docker Compose status:" >&2
+  run_compose ps >&2 || true
+  echo "[$(timestamp)] Recent Docker Compose logs:" >&2
+  run_compose logs --tail=80 >&2 || true
+  exit 1
 }
 
 find_chromium() {
-  for command_name in chromium-browser chromium; do
+  for command_name in chromium chromium-browser; do
     if command -v "$command_name" >/dev/null 2>&1; then
       echo "$command_name"
       return
     fi
   done
 
-  echo "Chromium was not found. Install chromium-browser on the Raspberry Pi." >&2
+  echo "Chromium was not found. Install it with:" >&2
+  echo "  sudo apt install chromium" >&2
   exit 1
 }
 
-ensure_desktop_session() {
-  if [[ -n "${DISPLAY:-}" || -n "${WAYLAND_DISPLAY:-}" ]]; then
-    return
-  fi
+if ! command -v curl >/dev/null 2>&1; then
+  fail "curl is required for kiosk health checks. Install it with: sudo apt install curl"
+fi
 
-  if [[ -S /tmp/.X11-unix/X0 ]]; then
-    export DISPLAY=:0
-    echo "DISPLAY was not set. Using DISPLAY=:0."
-    return
-  fi
+cd "$PROJECT_ROOT"
 
-  cat >&2 <<'EOF'
-No Raspberry Pi desktop session was detected.
-
-Chromium kiosk mode must be launched from the Pi desktop session, or from an
-environment that has DISPLAY or WAYLAND_DISPLAY set. If you run this over plain
-SSH, Chromium cannot find the screen and exits with "Missing X server or
-$DISPLAY".
-
-Use the desktop shortcut installer:
-
-  deploy/pi/install-desktop-shortcut.sh
-
-Then launch Dit Dit from the Pi desktop.
-EOF
-  exit 1
-}
-
-wait_for_ditdit() {
-  echo "Waiting for Dit Dit at $DITDIT_URL..."
-
-  for _ in $(seq 1 "$WAIT_SECONDS"); do
-    if command -v curl >/dev/null 2>&1; then
-      if curl --silent --fail "$DITDIT_URL" >/dev/null; then
-        return
-      fi
-    elif command -v wget >/dev/null 2>&1; then
-      if wget --quiet --spider "$DITDIT_URL"; then
-        return
-      fi
-    else
-      echo "curl or wget is required to wait for Dit Dit before launching kiosk mode." >&2
-      exit 1
-    fi
-
-    sleep 1
-  done
-
-  echo "Dit Dit did not respond at $DITDIT_URL after $WAIT_SECONDS seconds." >&2
-  echo "Check the Docker Compose service status below and retry after fixing the app startup." >&2
-  run_compose ps >&2 || true
-  exit 1
-}
-
-show_startup_cancel_window() {
-  if [[ "$STARTUP_CANCEL_ENABLED" != "1" ]]; then
-    return
-  fi
-
-  if ! [[ "$STARTUP_CANCEL_SECONDS" =~ ^[0-9]+$ ]]; then
-    echo "STARTUP_CANCEL_SECONDS must be a whole number. Using 10 seconds."
-    STARTUP_CANCEL_SECONDS=10
-  fi
-
-  if ! command -v zenity >/dev/null 2>&1; then
-    echo "zenity is not installed; skipping startup cancel window."
-    return
-  fi
-
-  local zenity_exit=0
-
-  zenity \
-    --question \
-    --title="Dit Dit Startup" \
-    --ok-label="Launch Dit Dit" \
-    --cancel-label="Cancel to Desktop" \
-    --timeout="$STARTUP_CANCEL_SECONDS" \
-    --width=520 \
-    --text="Dit Dit will launch in $STARTUP_CANCEL_SECONDS seconds.\n\nSelect Cancel to Desktop to stay at the desktop." \
-    || zenity_exit=$?
-
-  case "$zenity_exit" in
-    0)
-      echo "Startup window confirmed: launching Dit Dit."
-      ;;
-    1)
-      echo "Startup canceled by user. Staying on desktop."
-      exit 0
-      ;;
-    5)
-      echo "Startup window timed out; launching Dit Dit."
-      ;;
-    *)
-      echo "Startup window failed with exit code $zenity_exit; launching Dit Dit."
-      ;;
-  esac
-}
-
-start_ditdit
-wait_for_ditdit
+if health_check; then
+  echo "Dit Dit is already running."
+  mark_step "app health check"
+else
+  mark_step "app health check"
+  check_start_dependencies
+  start_service_or_container
+  wait_for_app
+fi
 
 CHROMIUM="$(find_chromium)"
-ensure_desktop_session
-show_startup_cancel_window
-
-mkdir -p "$LOG_DIR"
+export DISPLAY="${DISPLAY:-:0}"
+export XAUTHORITY="${XAUTHORITY:-/home/pi/.Xauthority}"
 export LIBGL_ALWAYS_SOFTWARE="${LIBGL_ALWAYS_SOFTWARE:-1}"
 
-echo "Launching Chromium kiosk mode with $CHROMIUM..."
-echo "Chromium log: $CHROMIUM_LOG"
+rm -rf /tmp/ditdit-kiosk-profile
+mkdir -p "$LOG_DIR"
+
+mark_step "Chromium launch"
+echo "[$(timestamp)] Launching Chromium kiosk mode with $CHROMIUM."
+echo "[$(timestamp)] Chromium log: $CHROMIUM_LOG"
+echo "[$(timestamp)] Total setup time: $(($(date +%s) - RUN_STARTED_AT))s"
 
 exec "$CHROMIUM" \
   --kiosk \
-  --no-first-run \
-  --noerrdialogs \
-  --disable-infobars \
-  --disable-session-crashed-bubble \
-  --disable-features=TranslateUI \
   --disable-gpu \
-  --disable-gpu-compositing \
-  --disable-gpu-rasterization \
-  --disable-accelerated-2d-canvas \
-  --disable-accelerated-video-decode \
   --disable-dev-shm-usage \
-  --disable-pinch \
-  --overscroll-history-navigation=0 \
+  --no-first-run \
+  --no-default-browser-check \
+  --disable-session-crashed-bubble \
+  --disable-infobars \
+  --disable-features=TranslateUI \
   --check-for-update-interval=31536000 \
-  --touch-events=enabled \
+  --user-data-dir=/tmp/ditdit-kiosk-profile \
   "$DITDIT_URL" \
   >"$CHROMIUM_LOG" 2>&1

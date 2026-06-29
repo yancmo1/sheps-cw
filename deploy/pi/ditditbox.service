@@ -1,0 +1,15 @@
+[Unit]
+Description=Dit Dit Box app service
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/ditditbox
+ExecStart=/usr/bin/docker compose -f deploy/pi/docker-compose.yml up -d --no-build
+ExecStop=/usr/bin/docker compose -f deploy/pi/docker-compose.yml down
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

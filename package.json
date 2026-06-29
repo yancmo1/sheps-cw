@@ -1,11 +1,16 @@
 {
-  "name": "ditdit",
+  "name": "ditditbox",
   "private": true,
   "scripts": {
     "ditdit:install": "npm --prefix app install",
-    "ditdit:dev": "npm --prefix app run dev -- --host 0.0.0.0",
     "ditdit:build": "npm --prefix app run build",
+    "ditdit:dev": "npm --prefix app run dev -- --host 0.0.0.0",
     "ditdit:preview": "npm --prefix app run preview -- --host 0.0.0.0",
-    "ditdit:kiosk": "bash deploy/pi/start-ditdit-kiosk.sh"
+    "pi:build-image": "docker compose -f deploy/pi/docker-compose.yml build",
+    "pi:start": "docker compose -f deploy/pi/docker-compose.yml up -d --no-build",
+    "pi:stop": "docker compose -f deploy/pi/docker-compose.yml down",
+    "pi:logs": "docker compose -f deploy/pi/docker-compose.yml logs -f",
+    "pi:kiosk": "bash deploy/pi/start-ditdit-kiosk.sh",
+    "ditdit:kiosk": "npm run pi:kiosk"
   }
 }
