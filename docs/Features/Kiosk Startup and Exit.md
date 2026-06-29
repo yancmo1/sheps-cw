@@ -30,8 +30,9 @@ The app already has an `Exit to Desktop` button in the current `app` interface.
 
 Current behavior:
 
-- The button opens a placeholder screen.
-- The placeholder says exit handling will be added in the Raspberry Pi launcher layer.
+- The button opens an exit confirmation screen.
+- Confirming exit attempts to close the browser window.
+- If Chromium does not allow the web app to close itself, the app shows guidance to close the Chromium window from the Pi desktop.
 
 Future behavior:
 
@@ -76,8 +77,8 @@ Acceptable recovery options:
 ## Open Questions
 
 - Should the app run from local Vite during development or from Docker/nginx during kiosk testing?
-- Should the kiosk URL be `http://localhost:8080`?
-- Should the launcher live under `scripts/pi/`, `deploy/pi/`, or another folder?
+- Current Pi appliance deployment serves Dit Dit at `127.0.0.1:3000` / `http://localhost:3000`; should any separate local-development Docker path keep using another port?
+- Should the launcher remain under `deploy/pi/` long term, or move to another runtime/deployment package later?
 - Should `Exit to Desktop` call a local helper endpoint, close the browser, or show instructions only?
 - Should the cancel window be 5 seconds, 10 seconds, or user-configurable?
 

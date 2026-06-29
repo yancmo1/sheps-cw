@@ -4,9 +4,11 @@ Last Updated: June 28, 2026
 
 ## Product Summary
 
-Dit Dit is the first runnable app shell for the Sheps CW project. The current goal is not full Morse training yet. The current goal is to prove that the app can launch cleanly, look good on the Raspberry Pi touchscreen, and provide a simple touch-first home screen for future practice, settings, and exit workflows.
+Dit Dit is the React/Vite CW trainer app and product for the Sheps CW project. The current goal is still early-stage Morse training, but the app has moved beyond a static shell: it should launch cleanly, look good on the Raspberry Pi touchscreen, and provide a simple touch-first foundation for practice, settings, progress, and exit workflows.
 
 Dit Dit is built under the W5XY Labs brand and uses Didah/CW language to keep the app approachable, recognizable, and connected to real Morse learning culture.
+
+Dit Dit Box is the Raspberry Pi appliance/kiosk deployment of Dit Dit. The active application lives in `app/`; the Pi appliance/kiosk layer lives in `deploy/pi/`.
 
 ## Current Repository Reality
 
@@ -35,15 +37,21 @@ The older dashboard was moved to:
 legacy/app-prototype/
 ```
 
-## Important Technical Gap
+## Deployment Alignment
 
-`docker-compose.yml` currently builds using:
+The active Pi deployment builds the top-level `app/` and serves Dit Dit through the appliance layer in `deploy/pi/`.
 
-```yaml
-context: ./app
+```text
+deploy/pi/
 ```
 
-Docker and scripts now target top-level `app/`, which is the official app home.
+The Pi kiosk path currently serves the app at:
+
+```text
+http://localhost:3000
+```
+
+The `ditditbox.service` name is acceptable because it refers to the Dit Dit Box appliance deployment, not just the React app.
 
 ## Current App Shell
 
@@ -52,13 +60,14 @@ The new Dit Dit app currently provides:
 - W5XY Labs brand kicker.
 - Main title: `Dit Dit`.
 - Subtitle: `CW Trainer`.
-- Large touch-friendly buttons:
-  - Practice
-  - Settings
-  - Exit to Desktop
-- Placeholder screens for Practice, Settings, and Exit.
+- Touch-friendly navigation for Practice, Progress, Settings, and Exit to Desktop.
+- Browser-based Morse audio.
+- Local settings persistence.
+- Local progress history.
+- Missed-character practice.
+- Exit-to-desktop flow foundation for the Pi kiosk environment.
 
-The app is intentionally minimal. This is good. The current milestone is visual proof and kiosk/navigation flow, not training logic.
+The app is intentionally still modest. This is good. The current milestone is a dependable touch-first practice foundation and Pi kiosk/navigation flow, not a complete adaptive learning platform.
 
 ## UX Direction
 
@@ -83,7 +92,7 @@ Planned startup behavior:
 2. User sees a short startup screen/message saying Dit Dit is about to launch.
 3. User has a small window of time to cancel to desktop.
 4. If not canceled, Dit Dit launches in kiosk/fullscreen mode.
-5. Inside the app, `Exit to Desktop` should eventually connect to the Pi launcher layer, not just a React placeholder.
+5. Inside the app, `Exit to Desktop` should continue to coordinate cleanly with the Pi launcher layer.
 
 This is a launcher/platform feature, not just a React feature.
 
@@ -92,12 +101,11 @@ This is a launcher/platform feature, not just a React feature.
 Do not build these yet unless specifically requested:
 
 - Full Morse timing engine.
-- Real practice session logic.
-- Audio engine.
 - GPIO key/paddle input.
-- Statistics storage.
 - Adaptive learning engine.
 - User accounts.
+- Backend services.
+- Dedicated reusable core engine package.
 
 Those belong after the app shell, kiosk launch, and project structure are stable.
 
@@ -109,16 +117,16 @@ Those belong after the app shell, kiosk launch, and project structure are stable
 4. Test the app through Docker.
 5. Test on the Raspberry Pi touchscreen.
 6. Continue kiosk launcher improvements (cancel-to-desktop behavior).
-7. Then begin the first real Practice screen.
+7. Continue extracting future core behavior out of the UI as the training engine becomes more concrete.
 
 ## First Practice Screen Target
 
-The first real practice screen should stay simple:
+The early practice experience should stay simple:
 
 - Show current lesson/focus.
-- Provide a large Start/Stop practice control.
-- Display input method placeholder.
-- Display a basic response area.
+- Provide clear start, repeat, answer, and finish controls.
+- Keep browser audio and lesson selection easy to test.
+- Track basic local results without overbuilding analytics.
 - Avoid scoring complexity until the Morse engine exists.
 
 ## Open Decisions
