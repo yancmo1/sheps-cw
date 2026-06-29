@@ -109,7 +109,7 @@ Older prototype is archived under:
 
 ## Known Gaps
 
-- Some deployed Pi installs may still have an older checkout under `/opt/ditditbox`; standardize to `/opt/ditdit`.
+- Use `/opt/ditditbox` as the canonical Pi checkout/install path for appliance deployment.
 - The root README is stale and should be updated soon.
 - No real Morse timing engine, lesson engine, audio engine, statistics engine, persistence layer, or hardware abstraction exists yet.
 - The Practice button does not start a real practice flow yet.

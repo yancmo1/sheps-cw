@@ -1,170 +1,197 @@
-# Dit Dit Raspberry Pi Deployment
+# Dit Dit Box Raspberry Pi Deployment
 
-This folder contains the Raspberry Pi proof-of-life deployment for Dit Dit.
+## Naming and paths
 
-The React/Vite app is built into static files and served by nginx in Docker. Chromium is not containerized. The Pi desktop session launches Chromium kiosk mode and points it at the containerized app on `http://localhost:3000`.
+- Repo/project: `ShepsCW` / `sheps-cw`
+- App/product: `Dit Dit`
+- App source: `app/`
+- Pi install path: `/opt/ditditbox`
+- Pi service: `ditditbox.service`
 
-## Root Helper Commands
+## Overview
+
+This folder contains the Raspberry Pi appliance startup layer for Dit Dit Box.
+
+The React/Vite app is built into a Docker image and served by nginx at `http://localhost:3000`. Chromium runs directly on the Raspberry Pi desktop, not inside Docker.
+
+Normal kiosk launch should be fast:
+
+1. The Docker app service starts at boot with systemd.
+2. The desktop shortcut runs `start-ditdit-kiosk.sh`.
+3. The launcher checks `http://localhost:3000`.
+4. If Dit Dit is already responding, it skips Docker and opens Chromium.
+5. If Dit Dit is not responding, it starts the existing container with `--no-build`.
+
+Docker image builds happen during install or update, not when clicking the desktop shortcut.
+
+## Expected Paths
+
+On the Raspberry Pi, the project checkout is expected at:
+
+```bash
+/opt/ditditbox
+```
+
+The Pi deployment files live under:
+
+```bash
+deploy/pi
+```
+
+This checkout currently keeps the active React app in `app/`. The Compose file builds that app directory and serves it through nginx on host port `3000`.
+
+## First-Time Install/Update
 
 From the repository root:
 
 ```bash
 npm run ditdit:install
 npm run ditdit:build
-npm run ditdit:kiosk
+npm run pi:build-image
+bash deploy/pi/install-systemd-service.sh
+bash deploy/pi/install-desktop-shortcut.sh
 ```
 
-The root `package.json` only delegates into `app`; it does not move the app.
+The systemd installer builds the Docker image once, installs `ditditbox.service`, enables it at boot, restarts it, and verifies the app responds at `http://localhost:3000`.
 
-## Files
+## Root Helper Commands
 
-- `docker-compose.yml` builds and runs the Dit Dit web container.
-- `start-ditdit-kiosk.sh` starts the container, waits for the app, then launches host Chromium in kiosk mode.
+Run these from the repository root:
 
-## Install Docker If Needed
+```bash
+npm run ditdit:install
+npm run ditdit:build
+npm run ditdit:dev
+npm run ditdit:preview
+npm run pi:build-image
+npm run pi:start
+npm run pi:stop
+npm run pi:logs
+npm run pi:kiosk
+```
 
-On Raspberry Pi OS, first check whether Docker and Compose are already installed:
+Important behavior:
+
+- `npm run pi:build-image` explicitly builds or updates the image.
+- `npm run pi:start` starts the Compose app with `--no-build`.
+- `npm run pi:kiosk` opens the fast kiosk launcher.
+
+## Systemd Service
+
+Install and enable the app service:
+
+```bash
+bash deploy/pi/install-systemd-service.sh
+```
+
+Check the service:
+
+```bash
+systemctl status ditditbox.service --no-pager
+```
+
+Check the app:
+
+```bash
+curl -fsS http://localhost:3000 && echo "Dit Dit ready"
+```
+
+The service starts only the Docker app service. It does not start Chromium.
+
+## Desktop Shortcut
+
+Install the desktop shortcut:
+
+```bash
+bash deploy/pi/install-desktop-shortcut.sh
+```
+
+The shortcut is copied to:
+
+```bash
+~/Desktop/DitDit.desktop
+```
+
+The shortcut runs:
+
+```bash
+/opt/ditditbox/deploy/pi/start-ditdit-kiosk.sh
+```
+
+If the desktop asks `Execute`, `Execute in Terminal`, or `Open`, run:
+
+```bash
+chmod +x ~/Desktop/DitDit.desktop
+gio set ~/Desktop/DitDit.desktop metadata::trusted true
+```
+
+Some Raspberry Pi desktop environments may still require right-clicking the Dit Dit icon and marking it trusted manually.
+
+## Fast Kiosk Launch Behavior
+
+Use:
+
+```bash
+npm run pi:kiosk
+```
+
+The fast launcher:
+
+- Checks `http://localhost:3000` first.
+- Prints `Dit Dit is already running.` and skips Docker when the app is healthy.
+- Starts `ditditbox.service` if the app is not responding.
+- Falls back to `docker compose -f deploy/pi/docker-compose.yml up -d --no-build` if the service is missing or fails.
+- Waits briefly for the app.
+- Detects `chromium`, then `chromium-browser`.
+- Launches Chromium with Pi-safe flags, including `--disable-gpu`.
+- Logs Chromium output to `/home/pi/.cache/ditdit/chromium.log`.
+
+Use the slower full launcher only for troubleshooting or update testing:
+
+```bash
+bash deploy/pi/start-ditdit-full.sh
+```
+
+That script builds the image, starts the app, then runs the kiosk launcher.
+
+## Troubleshooting
+
+View app logs:
+
+```bash
+npm run pi:logs
+```
+
+Restart the service:
+
+```bash
+sudo systemctl restart ditditbox.service
+systemctl status ditditbox.service --no-pager
+```
+
+Start the app without building:
+
+```bash
+npm run pi:start
+```
+
+Stop the app:
+
+```bash
+npm run pi:stop
+```
+
+Confirm Docker and Compose are installed:
 
 ```bash
 docker --version
 docker compose version
 ```
 
-If Docker is missing, a common Raspberry Pi OS install path is:
+Install Chromium if the launcher cannot find it:
 
 ```bash
-curl -fsSL https://get.docker.com | sh
-sudo usermod -aG docker "$USER"
+sudo apt install chromium
 ```
 
-Log out and back in, or reboot, so the Docker group change takes effect. Then confirm:
-
-```bash
-docker run hello-world
-docker compose version
-```
-
-## Start The App With Docker Compose
-
-From the repository root:
-
-```bash
-docker compose -f deploy/pi/docker-compose.yml up -d
-```
-
-Force a rebuild only when needed:
-
-```bash
-docker compose -f deploy/pi/docker-compose.yml up -d --build
-```
-
-Open the app on the Pi at:
-
-```text
-http://localhost:3000
-```
-
-The Compose service is named `ditdit`, uses `restart: unless-stopped`, and maps host port `3000` to nginx in the container.
-
-## Manually Launch Kiosk Mode
-
-Run this from the repository root while logged into the Pi desktop session:
-
-```bash
-deploy/pi/start-ditdit-kiosk.sh
-```
-
-The script:
-
-- Reuses the running `ditdit` container when already up (fast path).
-- Starts the Docker Compose app when needed.
-- Waits until `http://localhost:3000` responds.
-- Shows a visible startup window with `Launch Dit Dit` and `Cancel to Desktop` options.
-- Finds Chromium on the host.
-- Launches Chromium in kiosk mode pointed at Dit Dit.
-
-To force an image rebuild on launch, set:
-
-```bash
-DITDIT_BUILD_ON_START=1 deploy/pi/start-ditdit-kiosk.sh
-```
-
-Startup cancel window options:
-
-```bash
-STARTUP_CANCEL_ENABLED=1 STARTUP_CANCEL_SECONDS=10 deploy/pi/start-ditdit-kiosk.sh
-```
-
-- `STARTUP_CANCEL_ENABLED=1` enables the visible cancel window (default).
-- `STARTUP_CANCEL_SECONDS=10` controls the countdown before auto-launch.
-
-Chromium must run on the Pi desktop session. Do not run this script from a headless SSH-only session unless the desktop display environment is already available.
-
-If you see an error like this:
-
-```text
-Missing X server or $DISPLAY
-The platform failed to initialize.
-```
-
-Chromium was launched without access to the Pi display. Start the kiosk from the Pi desktop, or install the desktop shortcut below.
-
-You can override the target URL or wait timeout:
-
-```bash
-DITDIT_URL=http://localhost:3000 WAIT_SECONDS=90 deploy/pi/start-ditdit-kiosk.sh
-```
-
-## Install A Desktop Shortcut
-
-From the repository root on the Pi:
-
-```bash
-bash deploy/pi/install-desktop-shortcut.sh
-```
-
-This copies `deploy/pi/DitDit.desktop` to `~/Desktop/DitDit.desktop`, rewrites the shortcut `Exec=` path to the current checkout's launcher script, makes the launcher executable, sets `quick_exec=1` in `~/.config/libfm/libfm.conf`, and tries to mark the shortcut trusted. Use that shortcut from the Pi desktop session to start Docker Compose and launch Chromium kiosk mode.
-
-Some Raspberry Pi desktop environments may ask you to trust or allow the launcher the first time you click it.
-
-If the desktop shows a popup asking `Execute`, `Execute in Terminal`, or `Open`, run:
-
-```bash
-chmod +x ~/Desktop/DitDit.desktop
-gio set ~/Desktop/DitDit.desktop metadata::trusted true
-sed -i 's/^quick_exec=.*/quick_exec=1/' ~/.config/libfm/libfm.conf
-```
-
-Some Raspberry Pi desktop environments may still require right-clicking the icon and marking it trusted manually.
-
-The shortcut runs without opening a terminal window. Chromium output is written to:
-
-```text
-~/.cache/ditdit/chromium.log
-```
-
-## Chromium GPU Messages
-
-Some Raspberry Pi Chromium builds print EGL or GPU context errors such as:
-
-```text
-eglCreateContext: Requested version is not supported
-EGL_BAD_ATTRIBUTE
-CollectGraphicsInfo failed
-```
-
-Dit Dit does not need GPU acceleration yet, so the kiosk launcher disables Chromium GPU acceleration and uses software rendering. If the app opens correctly, these messages are not usually fatal.
-
-## Stop The App
-
-From the repository root:
-
-```bash
-docker compose -f deploy/pi/docker-compose.yml down
-```
-
-## Future Auto-Start
-
-Auto-start on reboot is intentionally not included yet. Add it after Docker + kiosk proof-of-life is confirmed on the Pi touchscreen.
-
-The likely next step is a desktop autostart entry or systemd user service that runs `deploy/pi/start-ditdit-kiosk.sh` after the Pi desktop session starts.
+Chromium must run from the Pi desktop session. Raspberry Pi Connect or NoMachine can help when desktop access is needed, but SSH is better for routine maintenance such as logs, service restarts, and image updates.

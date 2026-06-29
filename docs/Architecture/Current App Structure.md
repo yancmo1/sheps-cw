@@ -20,7 +20,7 @@ legacy/
 
 ## Why This Changed
 
-The project previously had two competing app roots (`app/src` and `app/ditdit/src`), which caused confusion in scripts, Docker, and agent targeting. The Dit Dit app has now been promoted to top-level `app/`, and the older dashboard prototype was archived.
+The project previously had two competing app roots, which caused confusion in scripts, Docker, and agent targeting. The Dit Dit app has now been promoted to top-level `app/`, and the older dashboard prototype was archived.
 
 ## Active App Surface
 
@@ -61,8 +61,8 @@ legacy/app-prototype/
 
 ## Pi Install Path Note
 
-For cleanliness and single-purpose Pi deployment, prefer checkout/install path:
+For appliance consistency, prefer checkout/install path:
 
 ```text
-/opt/ditdit
+/opt/ditditbox
 ```

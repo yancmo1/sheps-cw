@@ -1,8 +1,8 @@
 # Sheps CW
 
-A modern Morse Code (CW) training application designed to help operators learn, practice, and master Morse code through adaptive training techniques.
+A modern Morse Code (CW) training project with a touch-first Dit Dit app and a long-term core-first architecture.
 
-The project is being developed with a **core-first** architecture, allowing the Morse engine to remain independent from the user interface, audio system, and hardware platform. While the initial target is a Raspberry Pi 3 Model B, the long-term goal is dedicated handheld hardware.
+The project is being developed with a **core-first** architecture, allowing the Morse engine to remain independent from the user interface, audio system, and hardware platform. While the initial target is Raspberry Pi appliance deployment, the long-term goal is dedicated hardware.
 
 ---
 
@@ -43,22 +43,17 @@ This allows the same engine to power:
 
 ---
 
-# Planned Repository Layout
+# Current Repository Layout
 
 ```
-src/
-└── sheps_cw/
-    ├── app/
-    ├── ui/
-    ├── services/
-    ├── core/
-    ├── audio/
-    ├── hardware/
-    ├── storage/
-    └── utils/
+app/                    # canonical Dit Dit React/Vite app
+deploy/pi/              # Pi service, compose, launcher, desktop scripts
+docs/                   # planning and architecture notes
+legacy/app-prototype/   # archived earlier dashboard prototype
+src/ tests/ assets/     # placeholders for future core-first modules
 ```
 
-Additional project documentation is maintained under:
+Documentation is maintained under:
 
 ```
 docs/
@@ -110,6 +105,29 @@ docs/
 
 ---
 
+# Local and Pi Commands
+
+From repository root:
+
+```bash
+npm run ditdit:install
+npm run ditdit:dev
+npm run ditdit:build
+npm run ditdit:preview
+
+npm run pi:build-image
+npm run pi:start
+npm run pi:stop
+npm run pi:logs
+npm run pi:kiosk
+```
+
+Pi appliance install path expectation:
+
+```text
+/opt/ditditbox
+```
+
 # Development Setup
 
 Current development platform:
@@ -131,16 +149,14 @@ GPIO support will be introduced after the core engine is complete.
 
 # Current Status
 
-🚧 Early architecture phase.
+🚧 Active app shell + Pi deployment phase.
 
 Current focus:
 
-- Project structure
-- Documentation
-- Core architecture
-- Adaptive learning design
-
-No production code has been written yet.
+- Keep one canonical app path (`app/`)
+- Maintain clean Pi deployment flow under `deploy/pi/`
+- Continue kiosk startup/exit hardening and training-flow iteration
+- Preserve core-first architecture direction for future modules
 
 ---
 
