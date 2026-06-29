@@ -1,5 +1,5 @@
 {
-  "name": "ditditbox",
+  "name": "sheps-cw",
   "private": true,
   "scripts": {
     "ditdit:install": "npm --prefix app install",

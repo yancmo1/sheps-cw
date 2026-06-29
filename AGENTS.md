@@ -12,8 +12,8 @@ The repository also doubles as an Obsidian planning vault. Project intent and fe
 - Current app target: `app/`.
 - Earlier dashboard prototype has been archived under `legacy/app-prototype/`.
 - Build/dev commands should be run from the intended app folder.
-- Container: `docker-compose.yml` currently builds `app/Dockerfile` from `./app` and serves with nginx on host port `8080`.
-- Root `src/`, `tests/`, and `assets/` are placeholders for future non-UI/core work.
+- Pi appliance container: `deploy/pi/docker-compose.yml` builds the active app from `app/` and serves it with nginx at `http://localhost:3000`.
+- Root `src/`, `tests/`, and `assets/` are reserved for future non-UI/core work.
 
 ## Important Structure Warning
 
@@ -50,13 +50,14 @@ npm run lint
 npm run build
 ```
 
-Docker currently uses the top-level `app/` Dockerfile/context:
+Pi appliance Docker uses the top-level `app/` Dockerfile/context:
 
 ```sh
-docker compose up --build
+docker compose -f deploy/pi/docker-compose.yml build
+docker compose -f deploy/pi/docker-compose.yml up -d --no-build
 ```
 
-Docker and Pi compose now point at top-level `app/`.
+Docker and Pi compose should continue to point at top-level `app/`.
 
 ## Architecture Intent
 
@@ -89,9 +90,21 @@ Current target app:
 - Main entry: `app/src/main.jsx`.
 - App shell: `app/src/App.jsx`.
 - Styling: `app/src/styles.css`.
-- Home actions: Practice, Settings, Exit to Desktop.
-- Practice, Settings, and Exit are placeholders only.
-- Exit handling should eventually connect to the Raspberry Pi launcher/kiosk layer.
+- Current screens:
+  - Home
+  - Practice Setup
+  - Practice Session
+  - Results
+  - Progress
+  - Settings
+  - Exit
+- Current implemented app capabilities:
+  - Browser-based Morse audio
+  - Local settings persistence
+  - Local progress history
+  - Missed-character practice
+  - Pi kiosk/desktop exit flow foundation
+- Pi deployment lives under `deploy/pi/` and should remain separate from React app behavior.
 
 Older prototype is archived under:
 
@@ -111,7 +124,8 @@ Older prototype is archived under:
 
 - Use `/opt/ditditbox` as the canonical Pi checkout/install path for appliance deployment.
 - The root README is stale and should be updated soon.
-- No real Morse timing engine, lesson engine, audio engine, statistics engine, persistence layer, or hardware abstraction exists yet.
-- The Practice button does not start a real practice flow yet.
-- The Settings screen is a placeholder.
-- The Exit to Desktop screen is a placeholder and needs Pi launcher integration.
+- No dedicated reusable core Morse engine package exists yet.
+- No hardware key, paddle, or GPIO input exists yet.
+- Lesson progression and adaptive learning are still future phases.
+- Pi launcher/service hardening exists but still needs continued real-hardware testing.
+- Core-first architecture is still planned, but current implemented behavior is mostly inside the React app.
