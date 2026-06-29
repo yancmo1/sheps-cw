@@ -13,6 +13,7 @@ export default function PracticeSetupScreen({ onBack, onStart }) {
   const [mode, setMode] = useState('identify')
   const [lessonId, setLessonId] = useState(LESSONS[0].id)
   const [length, setLength] = useState(10)
+  const [autoAdvance, setAutoAdvance] = useState(false)
   const selectedLesson = LESSONS.find(lesson => lesson.id === lessonId) ?? LESSONS[0]
   const selectedMode = MODES.find(item => item.id === mode)
 
@@ -62,7 +63,8 @@ export default function PracticeSetupScreen({ onBack, onStart }) {
           <p className="selection-card-kicker">Current Selection</p>
           <p className="selection-card-title">{selectedLesson?.name ?? 'Character Set'}</p>
           <p className="selection-card-meta">
-            {selectedMode?.label ?? 'Listen & Identify'} · {length} items
+            {selectedMode?.label ?? 'Listen & Identify'} · {length} items ·{' '}
+            {autoAdvance ? 'Auto advance' : 'Manual advance'}
           </p>
           <div className="character-chip-row" aria-label="Selected characters">
             {(selectedLesson?.characters ?? []).map(character => (
@@ -88,6 +90,26 @@ export default function PracticeSetupScreen({ onBack, onStart }) {
             ))}
           </div>
         </fieldset>
+
+        <fieldset className="setup-field">
+          <legend className="setup-legend">Advance</legend>
+          <div className="option-group">
+            <button
+              type="button"
+              className={`option-btn${!autoAdvance ? ' option-btn-active' : ''}`}
+              onClick={() => setAutoAdvance(false)}
+            >
+              Manual
+            </button>
+            <button
+              type="button"
+              className={`option-btn${autoAdvance ? ' option-btn-active' : ''}`}
+              onClick={() => setAutoAdvance(true)}
+            >
+              Auto
+            </button>
+          </div>
+        </fieldset>
       </div>
 
       <div className="setup-actions">
@@ -97,6 +119,7 @@ export default function PracticeSetupScreen({ onBack, onStart }) {
           lessonName: selectedLesson?.name ?? 'Character Set',
           characters: selectedLesson?.characters ?? [],
           length,
+          autoAdvance,
         })}
         >
           Start

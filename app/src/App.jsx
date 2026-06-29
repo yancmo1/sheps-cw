@@ -46,6 +46,7 @@ export default function App() {
       characters: sessionResult.missed,
       sourceLessonName: sessionResult.lessonName,
       customLabel: `Missed Characters · ${sessionResult.missed.join(' ')}`,
+      autoAdvance: sessionConfig?.autoAdvance ?? false,
     })
     setScreen('session')
   }
