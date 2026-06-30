@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import TouchButton from '../components/TouchButton.jsx'
-import { LESSONS, getLessonById } from '../data/lessons.js'
+import { LESSONS, getLessonById } from '../data/lessons/index.js'
+import { MORSE } from '../data/morseCharacters.js'
 import { playCharacter } from '../audio/cwAudio.js'
-import { getPostCharacterDelayMs } from '../core/morseTiming.js'
+import { getMorseUnitSeconds, getPostCharacterDelayMs } from '../core/morseTiming.js'
 import { buildItems, calculateSessionResult } from '../core/session.js'
 
 const MODE_LABELS = {
@@ -17,6 +18,19 @@ function wait(ms) {
   return new Promise(resolve => {
     window.setTimeout(resolve, ms)
   })
+}
+
+function getPlaybackWindowMs(char, settings) {
+  const pattern = MORSE[char.toUpperCase()]
+  if (!pattern) return getPostCharacterDelayMs(settings)
+
+  const unitMs = getMorseUnitSeconds(settings?.wpm) * 1000
+  const elementMs = [...pattern].reduce((sum, element) => {
+    return sum + (element === '-' ? 3 * unitMs : unitMs)
+  }, 0)
+  const gapMs = Math.max(0, pattern.length - 1) * unitMs
+
+  return Math.ceil(elementMs + gapMs + getPostCharacterDelayMs(settings) + 100)
 }
 
 export default function PracticeSessionScreen({ config, settings, onFinish }) {
@@ -42,7 +56,7 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
     { fallbackCharacters: FALLBACK_CHARACTERS }
   ))
   const [index, setIndex] = useState(0)
-  const [phase, setPhase] = useState('playing')
+  const [phase, setPhase] = useState('ready')
   const [selected, setSelected] = useState(null)
 
   const settingsRef = useRef(settings)
@@ -51,49 +65,48 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
   const resultsRef = useRef([])
   const mountedRef = useRef(true)
   const playingRef = useRef(false)
+  const pendingAutoPlayRef = useRef(false)
 
   useEffect(() => {
+    mountedRef.current = true
     return () => { mountedRef.current = false }
   }, [])
-
-  useEffect(() => {
-    let stale = false
-
-    async function play() {
-      if (items.length === 0 || playingRef.current) return
-
-      playingRef.current = true
-      setPhase('playing')
-      try {
-        await playCharacter(items[index].char, settingsRef.current)
-        await wait(getPostCharacterDelayMs(settingsRef.current))
-      } finally {
-        playingRef.current = false
-        if (!stale && mountedRef.current) {
-          setPhase(isIdentify ? 'answering' : 'revealed')
-        }
-      }
-    }
-
-    play()
-
-    return () => { stale = true }
-  }, [index, isIdentify, items])
 
   async function handlePlayAgain() {
     if (items.length === 0 || playingRef.current) return
 
     playingRef.current = true
     const resumePhase = phase
-    setPhase('playing')
-    try {
-      await playCharacter(items[index].char, settingsRef.current)
-      await wait(getPostCharacterDelayMs(settingsRef.current))
-    } finally {
+    const completionPhase = resumePhase === 'ready'
+      ? isIdentify ? 'answering' : 'revealed'
+      : resumePhase
+    const settingsSnapshot = settingsRef.current
+    let completed = false
+    let completionTimer = null
+
+    function completePlayback() {
+      if (completed) return
+      completed = true
+      if (completionTimer) {
+        window.clearTimeout(completionTimer)
+      }
       playingRef.current = false
       if (mountedRef.current) {
-        setPhase(resumePhase)
+        setPhase(completionPhase)
       }
+    }
+
+    setPhase('playing')
+    completionTimer = window.setTimeout(
+      completePlayback,
+      getPlaybackWindowMs(items[index].char, settingsSnapshot)
+    )
+
+    try {
+      await playCharacter(items[index].char, settingsSnapshot)
+      await wait(getPostCharacterDelayMs(settingsSnapshot))
+    } finally {
+      completePlayback()
     }
   }
 
@@ -137,7 +150,7 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
     }))
   }
 
-  function handleNext() {
+  function handleNext({ autoPlay = false } = {}) {
     if (!isIdentify) {
       recordListenOnlyItem()
     }
@@ -149,8 +162,17 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
     }
 
     setSelected(null)
+    pendingAutoPlayRef.current = autoPlay
+    setPhase('ready')
     setIndex(nextIndex)
   }
+
+  useEffect(() => {
+    if (!pendingAutoPlayRef.current || phase !== 'ready' || playingRef.current) return
+
+    pendingAutoPlayRef.current = false
+    handlePlayAgain()
+  }, [index, phase])
 
   useEffect(() => {
     const shouldAutoAdvance = autoAdvance
@@ -160,12 +182,46 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
 
     const timer = window.setTimeout(() => {
       if (mountedRef.current) {
-        handleNext()
+        handleNext({ autoPlay: true })
       }
     }, AUTO_ADVANCE_DELAY_MS)
 
     return () => window.clearTimeout(timer)
   }, [autoAdvance, index, isIdentify, phase])
+
+  useEffect(() => {
+    function handleKeyDown(event) {
+      if (event.metaKey || event.ctrlKey || event.altKey) return
+      if (event.repeat) return
+
+      if ((event.key === 'Enter' || event.key === ' ') && phase === 'ready') {
+        event.preventDefault()
+        handlePlayAgain()
+        return
+      }
+
+      if (
+        (event.key === 'Enter' || event.key === ' ')
+        && (phase === 'feedback' || phase === 'revealed')
+      ) {
+        event.preventDefault()
+        handleNext()
+        return
+      }
+
+      if (!isIdentify || phase !== 'answering') return
+
+      const choice = event.key.toUpperCase()
+      if (!MORSE[choice]) return
+
+      event.preventDefault()
+      handleAnswer(choice)
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isIdentify, phase, index])
+
 
   if (!lesson || items.length === 0) {
     return (
@@ -194,6 +250,11 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
   const showFeedback = phase === 'feedback' || phase === 'revealed'
   const isCorrect = selected === item.char
   const sessionLabel = config.customLabel ?? lesson.name
+  const completedItems = resultsRef.current
+  const answeredCount = completedItems.length
+  const correctCount = completedItems.filter(result => result.correct === true).length
+  const liveAccuracy = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : null
+  const progressPct = Math.round(((index + (showFeedback ? 1 : 0)) / items.length) * 100)
 
   return (
     <section className="screen session-screen" aria-labelledby="session-title">
@@ -202,6 +263,11 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
           <p className="session-progress" aria-live="polite">
             {index + 1} <span className="session-progress-of">of</span> {items.length}
           </p>
+          {isIdentify && (
+            <p className="session-accuracy">
+              Accuracy {liveAccuracy === null ? '—' : `${liveAccuracy}%`}
+            </p>
+          )}
           <p className="session-label">{modeLabel}</p>
           <p className="session-subtitle">{sessionLabel}</p>
           {config.sourceLessonName && (
@@ -214,6 +280,10 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
       </div>
 
       <h1 id="session-title" className="screen-title session-title">Practice Session</h1>
+
+      <div className="session-meter" aria-hidden="true">
+        <span style={{ width: `${progressPct}%` }} />
+      </div>
 
       <div className="char-display" aria-live="polite" aria-label="Character">
         {phase === 'revealed' || phase === 'feedback'
@@ -228,9 +298,35 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
           onClick={handlePlayAgain}
           disabled={!canPlayAgain}
         >
-          ▶ Play Again
+          {phase === 'ready' ? '▶ Play' : '▶ Play Again'}
         </TouchButton>
+        {isIdentify && (
+          <TouchButton
+            variant="secondary"
+            size="sm"
+            onClick={() => handleAnswer(null)}
+            disabled={phase !== 'answering'}
+          >
+            I don&apos;t know
+          </TouchButton>
+        )}
       </div>
+
+      {showFeedback && (
+        <div className="session-feedback">
+          {isIdentify && (
+            <p className={`feedback-text ${isCorrect ? 'feedback-correct' : 'feedback-wrong'}`}>
+              {isCorrect ? '✓ Correct!' : `✗ Answer: ${item.char}`}
+            </p>
+          )}
+          {!isIdentify && (
+            <p className="feedback-text">Listen again or continue when you are ready.</p>
+          )}
+          <TouchButton onClick={handleNext}>
+            {isLastItem ? 'See Results' : 'Next →'}
+          </TouchButton>
+        </div>
+      )}
 
       {isIdentify && (
         <div className="answer-grid" role="group" aria-label="Answer choices">
@@ -253,22 +349,6 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
               </button>
             )
           })}
-        </div>
-      )}
-
-      {showFeedback && (
-        <div className="session-feedback">
-          {isIdentify && (
-            <p className={`feedback-text ${isCorrect ? 'feedback-correct' : 'feedback-wrong'}`}>
-              {isCorrect ? '✓ Correct!' : `✗ Answer: ${item.char}`}
-            </p>
-          )}
-          {!isIdentify && (
-            <p className="feedback-text">Listen again or continue when you are ready.</p>
-          )}
-          <TouchButton onClick={handleNext}>
-            {isLastItem ? 'See Results' : 'Next →'}
-          </TouchButton>
         </div>
       )}
     </section>

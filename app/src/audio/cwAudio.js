@@ -1,4 +1,4 @@
-import { MORSE } from '../data/morse.js'
+import { MORSE } from '../data/morseCharacters.js'
 import { getMorseUnitSeconds } from '../core/morseTiming.js'
 
 export { getMorseUnitSeconds, getPostCharacterDelayMs } from '../core/morseTiming.js'

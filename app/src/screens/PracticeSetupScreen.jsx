@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import TouchButton from '../components/TouchButton.jsx'
-import { LESSONS } from '../data/lessons.js'
+import { LESSONS } from '../data/lessons/index.js'
 
 const MODES = [
   { id: 'identify', label: 'Listen & Identify' },
@@ -63,9 +63,13 @@ export default function PracticeSetupScreen({ onBack, onStart }) {
           <p className="selection-card-kicker">Current Selection</p>
           <p className="selection-card-title">{selectedLesson?.name ?? 'Character Set'}</p>
           <p className="selection-card-meta">
+            {selectedLesson?.path ? `${selectedLesson.path} · ` : ''}
             {selectedMode?.label ?? 'Listen & Identify'} · {length} items ·{' '}
             {autoAdvance ? 'Auto advance' : 'Manual advance'}
           </p>
+          {selectedLesson?.description && (
+            <p className="selection-card-description">{selectedLesson.description}</p>
+          )}
           <div className="character-chip-row" aria-label="Selected characters">
             {(selectedLesson?.characters ?? []).map(character => (
               <span key={character} className="character-chip">

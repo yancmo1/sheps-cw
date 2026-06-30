@@ -41,7 +41,7 @@ function normalizeMissed(missed, items) {
     return [...new Set(missed.filter(char => typeof char === 'string' && char))]
   }
 
-  return [...new Set(items.filter(item => !item.correct).map(item => item.character))]
+  return [...new Set(items.filter(item => item.correct === false).map(item => item.character))]
 }
 
 function normalizeSession(entry) {
@@ -165,4 +165,52 @@ export function getMissedCharacterSummary(history) {
   return [...counts.entries()]
     .map(([character, count]) => ({ character, count }))
     .sort((a, b) => b.count - a.count || a.character.localeCompare(b.character))
+}
+
+export function getCharacterMasterySummary(history) {
+  const counts = new Map()
+
+  for (const session of Array.isArray(history) ? history : []) {
+    if (session?.mode !== 'identify') continue
+
+    for (const item of Array.isArray(session.items) ? session.items : []) {
+      if (!item?.character || typeof item.correct !== 'boolean') continue
+
+      const entry = counts.get(item.character) ?? {
+        character: item.character,
+        attempts: 0,
+        correct: 0,
+        missed: 0,
+      }
+
+      entry.attempts += 1
+      if (item.correct) {
+        entry.correct += 1
+      } else {
+        entry.missed += 1
+      }
+      counts.set(item.character, entry)
+    }
+  }
+
+  return [...counts.values()]
+    .map(entry => {
+      const accuracy = entry.attempts > 0
+        ? Math.round((entry.correct / entry.attempts) * 100)
+        : 0
+      const status = entry.attempts < 5
+        ? 'New'
+        : accuracy >= 85
+          ? 'Solid'
+          : accuracy >= 65
+            ? 'Building'
+            : 'Review'
+
+      return {
+        ...entry,
+        accuracy,
+        status,
+      }
+    })
+    .sort((a, b) => a.character.localeCompare(b.character, undefined, { numeric: true }))
 }

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import TouchButton from '../components/TouchButton.jsx'
 import {
+  getCharacterMasterySummary,
   clearSessionHistory,
   getMissedCharacterSummary,
   getProgressSummary,
@@ -24,6 +25,10 @@ export default function ProgressScreen({ onPractice, onHome }) {
   const summary = useMemo(() => getProgressSummary(history), [history])
   const missedCharacters = useMemo(
     () => getMissedCharacterSummary(history).slice(0, 8),
+    [history]
+  )
+  const characterMastery = useMemo(
+    () => getCharacterMasterySummary(history),
     [history]
   )
   const hasHistory = history.length > 0
@@ -96,6 +101,26 @@ export default function ProgressScreen({ onPractice, onHome }) {
               <p className="missed-chars all-correct">No missed characters recorded yet.</p>
             )}
           </section>
+
+          {characterMastery.length > 0 && (
+            <section className="results-card" aria-labelledby="mastery-title">
+              <p id="mastery-title" className="section-kicker">Character Mastery</p>
+              <div className="mastery-grid" aria-label="Per-character mastery">
+                {characterMastery.map(item => (
+                  <article
+                    key={item.character}
+                    className={`mastery-chip mastery-chip-${item.status.toLowerCase()}`}
+                  >
+                    <span className="mastery-character">{item.character}</span>
+                    <span className="mastery-status">{item.status}</span>
+                    <span className="mastery-detail">
+                      {item.accuracy}% · {item.attempts} heard
+                    </span>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
 
           <section className="progress-history" aria-labelledby="recent-sessions-title">
             <p id="recent-sessions-title" className="section-kicker">Recent Sessions</p>
