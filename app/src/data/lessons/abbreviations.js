@@ -1,0 +1,32 @@
+export const ABBREVIATIONS_LESSONS = [
+  {
+    id: 'qcodes-basic',
+    name: 'Basic Q-Codes',
+    family: 'vocabulary',
+    path: 'Q-Codes & Abbreviations',
+    characters: ['Q', 'S', 'O', 'T', 'H', 'R'],
+    description: 'Essential letters for Q-codes: QSO (conversation), QTH (location), QRM (interference), QRN (noise), QRZ (who is calling).',
+    recommendedWPM: 16,
+    recommendedFarnsworth: 11,
+  },
+  {
+    id: 'abbreviations-common',
+    name: 'Common Abbreviations',
+    family: 'vocabulary',
+    path: 'Q-Codes & Abbreviations',
+    characters: ['C', 'Q', 'D', 'E', 'T', 'N', 'X'],
+    description: 'CQ, DE (from), TNX (thanks), QSL (acknowledge), CW (Morse code).',
+    recommendedWPM: 16,
+    recommendedFarnsworth: 11,
+  },
+  {
+    id: 'numbers-phonetic',
+    name: 'Numbers in Callsigns',
+    family: 'vocabulary',
+    path: 'Callsign Practice',
+    characters: ['W', 'K', 'N', '1', '2', '3', '4', '5', 'A', 'B', 'C', 'D'],
+    description: 'Common US callsign patterns with numbers: W1ABC, K2XYZ, N3DEF.',
+    recommendedWPM: 16,
+    recommendedFarnsworth: 11,
+  },
+]

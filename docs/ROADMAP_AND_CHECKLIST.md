@@ -1,8 +1,23 @@
 # Dit Dit: Roadmap & Implementation Checklist
 
-**Last Updated:** June 30, 2026  
-**Status:** Early-stage foundation phase  
+**Last Updated:** July 1, 2026  
+**Status:** Phase 1 content + UX + core extraction complete; adaptive foundation next  
 **Reference Document:** [Dit_Dit_Design_Review_and_Improvements.md](Dit_Dit_Design_Review_and_Improvements.md) (archived June 29 — comprehensive 40+ improvement opportunities, basis for this checklist)
+
+---
+
+## Phase 1 Progress: 75% Complete
+
+**Content & UX (✅ Complete)**
+- Expanded to 42 lessons across 9 learning paths
+- Full alphabet, digits (0-9), 7 prosigns all available
+- Practice Setup refactored: Learning Plans dropdown + multiselect lesson interface
+- Users can now combine lessons for mixed practice
+
+**Next in Phase 1:**
+- Per-character accuracy tracking foundation
+- Pi kiosk startup/exit flow
+- First-launch user onboarding
 
 ---
 
@@ -35,55 +50,77 @@ Core foundation is in place:
 
 **Goal:** Expand to comprehensive character coverage, structured lessons, and core extraction. This phase unlocks adaptive learning and professional-quality foundation.
 
-### Content Expansion
+### Content Expansion ✅
 
-- [ ] **Add full alphabet (26 letters)** → already have E T A O I N S H R etc., add remaining: B C D F G J K L M P Q U V W X Y Z
-  - [ ] Update lessons.js with complete letter set
-  - [ ] Add to relevant lesson paths
-  - [ ] Test in app: verify all 26 in practice
+- [x] **Add full alphabet (26 letters)** 
+  - [x] Update lessons.js with complete letter set
+  - [x] Add to relevant lesson paths
+  - [x] Test in app: verify all 26 in practice
 
-- [ ] **Add digits (0-9)**
-  - [ ] Create digits.js lesson
-  - [ ] Add to Numbers lesson path
-  - [ ] Test practice session with digits
+- [x] **Add digits (0-9)**
+  - [x] Create digits.js lesson (Numbers: 0-4, 5-9, All)
+  - [x] Add to Numbers lesson path (3 lessons)
+  - [x] Test practice session with digits
 
-- [ ] **Add prosigns (AR, SK, BT, AS, KN, etc.)**
-  - [ ] Create prosigns.js lesson
-  - [ ] Add as separate practice path
-  - [ ] Update morse library with prosign encodings
+- [x] **Add prosigns (AR, SK, BT, AS, KN, CA, SOS)**
+  - [x] Create prosigns.js lesson (2 lessons: Basic + Extended)
+  - [x] Add as separate practice path
+  - [x] Update morse library with prosign encodings
 
-- [ ] **Create structured lesson library (40+ lessons)**
-  - [ ] Beginner track: Koch Method 1-10, 11-20, 21-30, 31-40 (4 lessons)
-  - [ ] LICW track: LICW Lessons 1-12 (12 lessons)
-  - [ ] Character-focused: Single letters, letter pairs, confusing pairs (E/T, H/5, etc.)
-  - [ ] Common words: THE, AND, FOR, TO, IS, etc. (1 lesson)
-  - [ ] Callsigns: W1ABC, K2XYZ format (1 lesson)
-  - [ ] Q-codes: QSO, QTH, QRM, QRN, QRZ (1 lesson)
-  - [ ] Abbreviations: CQ, DE, 73, 88, TNX (1 lesson)
-  - [ ] Speed drills: Same lesson at increasing WPM (3 lessons)
-  - [ ] **Acceptance:** 40+ lessons available, users see them in Lessons screen, can select any
+- [x] **Create structured lesson library (42 lessons total)**
+  - [x] Beginner track (4 lessons): E I S H 5, T M O 0, A N, W J
+  - [x] Koch track (13 lessons): Koch Method 1-13 full progression
+  - [x] LICW track (6 lessons): Long Island CW Club method
+  - [x] Numbers track (3 lessons): 0-4, 5-9, All 0-9
+  - [x] Review track (1 lesson): A-Z Full Alphabet
+  - [x] Common track (5 lessons): All letters, all digits, letters+digits, common words, Q-codes
+  - [x] Prosigns track (2 lessons): Basic + Extended prosigns
+  - [x] Abbreviations track (3 lessons): Q-codes, abbreviations, callsigns
+  - [x] Confusing Pairs track (6 lessons): E/T, I/S, H/5, D/B, G/7, M/N focused drills
+  - [x] **Acceptance:** 42 lessons available, organized by Learning Plans, users can multiselect
 
-### Core Architecture Extraction
+### Practice Setup UX ✅
 
-- [ ] **Create core Morse engine structure**
-  - [ ] Create src/core/ folder hierarchy
-  - [ ] Move morseTiming.js calculations to pure functions (no React dependency)
-  - [ ] Extract character encoding to standalone module
-  - [ ] Create session generator (no UI coupling)
-  - [ ] **Acceptance:** Core modules have zero imports from app/src/components/
+- [x] **Organize Practice Setup by Learning Plans**
+  - [x] Extract unique learning paths from lesson data
+  - [x] Implement dropdown to select Learning Plan
+  - [x] Display lessons for selected plan below
+  - [x] **Acceptance:** Dropdown shows Koch, LICW, Full Character Set, etc.; lessons group under each
 
-- [ ] **Add unit tests for core engine**
-  - [ ] Test timing calculations (dit/dah/space durations at various WPM)
-  - [ ] Test Farnsworth timing math
-  - [ ] Test character-to-morse encoding
-  - [ ] Test morse-to-character decoding
-  - [ ] **Acceptance:** >90% test coverage for src/core/
+- [x] **Implement multiselect lesson interface**
+  - [x] Allow users to click multiple lessons
+  - [x] Combine character sets from selected lessons
+  - [x] Show combined character preview
+  - [x] Replace old button-grid UI
+  - [x] **Acceptance:** Users can select "Koch 1 + Koch 2 + Q-codes" and practice mixed set
 
-- [ ] **Document core engine API**
-  - [ ] Write timingCalculator.md explaining timing math
-  - [ ] Write charsetCodec.md explaining encoding format
-  - [ ] Write sessionBuilder.md API reference
-  - [ ] **Acceptance:** Another developer can use core without touching React
+- [x] **Add custom character input as alternative**
+  - [x] Text input field for manual character entry
+  - [x] Toggle between lesson selection and custom input
+  - [x] Validate characters exist in Morse library
+  - [x] **Acceptance:** Users can enter "EISH" or "ABC123" for custom practice
+
+### Core Architecture Extraction ✅
+
+- [x] **Create core Morse engine structure** → Completed 2026-07-01
+  - [x] Create src/core/ folder hierarchy
+  - [x] Move morseTiming.js calculations to pure functions (no React dependency)
+  - [x] Extract character encoding to standalone module
+  - [x] Create session generator (no UI coupling)
+  - [x] **Acceptance:** Core modules have zero imports from app/src/components/
+
+- [x] **Add unit tests for core engine** → Completed 2026-07-01
+  - [x] Test timing calculations (dit/dah/space durations at various WPM)
+  - [x] Test Farnsworth timing math
+  - [x] Test character-to-morse encoding
+  - [x] Test morse-to-character decoding
+  - [x] **Acceptance:** >90% test coverage for src/core/
+
+- [x] **Document core engine API** → Completed 2026-07-01
+  - [x] Write timingCalculator.md explaining timing math
+  - [x] Write charsetCodec.md explaining encoding format
+  - [x] Write sessionBuilder.md API reference
+  - [x] **Acceptance:** Another developer can use core without touching React
 
 ### Adaptive Learning Foundation
 
@@ -513,6 +550,6 @@ When marking a task complete:
 
 ---
 
-**Last Reviewed:** June 30, 2026  
-**Next Review:** July 7, 2026  
+**Last Reviewed:** July 1, 2026  
+**Next Review:** July 8, 2026  
 **Owner:** W5XY Labs / Dit Dit Project

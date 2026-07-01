@@ -1,4 +1,4 @@
-import { MORSE } from '../data/morseCharacters.js'
+import { encodeCharacter } from '../core/codec/charsetCodec.js'
 import { getMorseUnitSeconds } from '../core/morseTiming.js'
 
 export { getMorseUnitSeconds, getPostCharacterDelayMs } from '../core/morseTiming.js'
@@ -23,7 +23,7 @@ function getContext() {
  * @returns {Promise<void>} Resolves when playback is complete.
  */
 export async function playCharacter(char, { wpm = 20, frequency = 600, volume = 80 } = {}) {
-  const pattern = MORSE[char.toUpperCase()]
+  const pattern = encodeCharacter(char)
   if (!pattern) return
 
   const ctx = getContext()

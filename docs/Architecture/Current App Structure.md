@@ -1,6 +1,6 @@
 # Current App Structure
 
-Last Updated: June 28, 2026
+Last Updated: July 1, 2026
 
 ## Current State
 
@@ -29,6 +29,28 @@ Current Dit Dit interface includes:
 - Practice
 - Settings
 - Exit to Desktop
+
+## Core Engine Extraction (Phase 1)
+
+The active app now includes a pure core layer under `app/src/core/`:
+
+```text
+app/src/core/
+├── timing/timingCalculator.js
+├── codec/charsetCodec.js
+├── codec/morseMap.js
+├── session/sessionBuilder.js
+├── morseTiming.js      # compatibility re-export
+└── session.js          # compatibility re-export
+```
+
+This layer has zero React/component imports and is covered by unit tests in:
+
+```text
+app/src/core/**\/*.test.js
+```
+
+Coverage thresholds are configured in `app/vite.config.js` at 90% for the core modules.
 
 ## Docker and Kiosk Alignment
 

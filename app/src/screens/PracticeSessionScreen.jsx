@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import TouchButton from '../components/TouchButton.jsx'
 import { LESSONS, getLessonById } from '../data/lessons/index.js'
-import { MORSE } from '../data/morseCharacters.js'
+import { encodeCharacter, isSupportedCharacter } from '../core/codec/charsetCodec.js'
 import { playCharacter } from '../audio/cwAudio.js'
-import { getMorseUnitSeconds, getPostCharacterDelayMs } from '../core/morseTiming.js'
+import { getCharacterPlaybackDurationMs, getPostCharacterDelayMs } from '../core/morseTiming.js'
 import { buildItems, calculateSessionResult } from '../core/session.js'
 
 const MODE_LABELS = {
@@ -21,16 +21,9 @@ function wait(ms) {
 }
 
 function getPlaybackWindowMs(char, settings) {
-  const pattern = MORSE[char.toUpperCase()]
+  const pattern = encodeCharacter(char)
   if (!pattern) return getPostCharacterDelayMs(settings)
-
-  const unitMs = getMorseUnitSeconds(settings?.wpm) * 1000
-  const elementMs = [...pattern].reduce((sum, element) => {
-    return sum + (element === '-' ? 3 * unitMs : unitMs)
-  }, 0)
-  const gapMs = Math.max(0, pattern.length - 1) * unitMs
-
-  return Math.ceil(elementMs + gapMs + getPostCharacterDelayMs(settings) + 100)
+  return getCharacterPlaybackDurationMs(pattern, settings) + 100
 }
 
 export default function PracticeSessionScreen({ config, settings, onFinish }) {
@@ -212,7 +205,7 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
       if (!isIdentify || phase !== 'answering') return
 
       const choice = event.key.toUpperCase()
-      if (!MORSE[choice]) return
+      if (!isSupportedCharacter(choice)) return
 
       event.preventDefault()
       handleAnswer(choice)

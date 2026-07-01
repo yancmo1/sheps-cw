@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "validate:lessons": "node ./scripts/validate-lessons.mjs"
+    "validate:lessons": "node ./scripts/validate-lessons.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "react": "^19.2.7",
@@ -15,6 +18,8 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.0.2",
-    "vite": "^8.1.0"
+    "@vitest/coverage-v8": "^3.2.4",
+    "vite": "^8.1.0",
+    "vitest": "^3.2.4"
   }
 }

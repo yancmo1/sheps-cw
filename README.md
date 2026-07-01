@@ -82,7 +82,9 @@ Dit Dit is a touch-first Morse code training app with browser-based audio and lo
 
 - **Audio**: Browser-based Morse audio generation with adjustable tone and speed (Farnsworth timing support)
 - **Practice**: Touch-friendly practice session interface with visual and audio feedback
-- **Lessons**: Multiple lesson paths including Beginner, Koch Method, LICW, Numbers, and Review
+- **Lessons**: 42 lessons across 9 learning paths (Koch Method, LICW, Beginner, Numbers, Prosigns, Abbreviations, Confusing Pairs, Common, Review)
+- **Practice Setup**: Learning Plans dropdown with multiselect lesson interface; supports combining lessons and custom character input
+- **Character Coverage**: Full alphabet (26 letters), digits (0-9), 7 prosigns (AR, SK, BT, AS, KN, CA, SOS)
 - **Persistence**: Local settings (speed, tone, volume) and practice history saved in browser
 - **Missed-Character Practice**: Focused practice on characters you got wrong
 - **Navigation**: Touch-first home screen with Practice, Progress, Settings, and Exit flows
@@ -170,7 +172,7 @@ Initial audio controls:
 1. Verify touch-first practice flow works smoothly on Pi touchscreen
 2. Harden kiosk startup (cancel-to-desktop behavior)
 3. Test local persistence and multi-session workflows
-4. Begin extracting reusable Morse engine modules to `src/` (preparation for core-first architecture)
+4. Build adaptive learning features on top of extracted core modules
 
 **Single Source of Truth**:
 
@@ -197,16 +199,20 @@ Each item includes acceptance criteria and dependencies.
 
 ### Quick Status
 
+**Phase 1 Progress: 60% Complete**
+
 - [x] Touch-first app foundation + browser audio
 - [x] Local persistence (settings + progress history)
 - [x] Multiple lesson paths (Beginner, Koch, LICW, Numbers, Review)
 - [x] Raspberry Pi deployment + kiosk integration
-- [ ] Comprehensive character coverage (26 letters + digits)
-- [ ] Structured 40+ lesson library
+- [x] Comprehensive character coverage (26 letters + digits + 7 prosigns)
+- [x] Structured 42-lesson library organized by learning paths
+- [x] Practice Setup UX (Learning Plans dropdown + multiselect lessons)
+- [x] Core Morse engine extraction (reusable, testable)
+- [x] Unit tests for core timing/codec/session (>90% core coverage)
 - [ ] Adaptive learning engine
-- [ ] Core Morse engine extraction (reusable, testable)
 
-See **[ROADMAP_AND_CHECKLIST.md](docs/ROADMAP_AND_CHECKLIST.md)** for actionable next steps.
+See **[ROADMAP_AND_CHECKLIST.md](docs/ROADMAP_AND_CHECKLIST.md)** for detailed phase breakdown and next steps.
 
 ---
 

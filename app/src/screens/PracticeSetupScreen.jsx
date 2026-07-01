@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import TouchButton from '../components/TouchButton.jsx'
 import { LESSONS } from '../data/lessons/index.js'
+import { parseCharacterInput } from '../core/codec/charsetCodec.js'
 
 const MODES = [
   { id: 'identify', label: 'Listen & Identify' },
@@ -9,12 +10,52 @@ const MODES = [
 
 const SESSION_LENGTHS = [5, 10, 15]
 
+// Extract unique learning paths/families
+const LEARNING_PLANS = Array.from(
+  new Map(LESSONS.map(l => [l.path || l.family, { path: l.path || l.family, family: l.family }])).values()
+).sort((a, b) => a.path.localeCompare(b.path))
+
 export default function PracticeSetupScreen({ onBack, onStart }) {
   const [mode, setMode] = useState('identify')
-  const [lessonId, setLessonId] = useState(LESSONS[0].id)
+  const [selectedPlan, setSelectedPlan] = useState(LEARNING_PLANS[0]?.path || '')
+  const [selectedLessonIds, setSelectedLessonIds] = useState([])
   const [length, setLength] = useState(10)
   const [autoAdvance, setAutoAdvance] = useState(false)
-  const selectedLesson = LESSONS.find(lesson => lesson.id === lessonId) ?? LESSONS[0]
+  const [customCharacters, setCustomCharacters] = useState('')
+  
+  // Get lessons for selected plan
+  const lessonsInPlan = LESSONS.filter(l => (l.path || l.family) === selectedPlan)
+  
+  // Handle plan change — reset selected lessons
+  const handlePlanChange = (newPlan) => {
+    setSelectedPlan(newPlan)
+    setSelectedLessonIds([])
+  }
+  
+  // Toggle lesson selection
+  const toggleLessonId = (lessonId) => {
+    setSelectedLessonIds(prev =>
+      prev.includes(lessonId)
+        ? prev.filter(id => id !== lessonId)
+        : [...prev, lessonId]
+    )
+  }
+  
+  // Build combined character set from selected lessons
+  const combinedCharacters = selectedLessonIds
+    .map(id => LESSONS.find(l => l.id === id)?.characters || [])
+    .flat()
+    .filter((char, index, arr) => arr.indexOf(char) === index) // deduplicate
+  
+  const { characters: customCharacterSet, invalidTokens } = parseCharacterInput(customCharacters)
+
+  const isCustom = selectedLessonIds.length === 0 && customCharacters.trim() !== ''
+  const selectedCharacters = isCustom ? customCharacterSet : combinedCharacters
+  
+  const selectedLessons = selectedLessonIds
+    .map(id => LESSONS.find(l => l.id === id))
+    .filter(Boolean)
+  
   const selectedMode = MODES.find(item => item.id === mode)
 
   return (
@@ -44,39 +85,102 @@ export default function PracticeSetupScreen({ onBack, onStart }) {
         </fieldset>
 
         <fieldset className="setup-field">
-          <legend className="setup-legend">Character Set</legend>
-          <div className="option-group">
-            {LESSONS.map(l => (
-              <button
-                key={l.id}
-                type="button"
-                className={`option-btn${lessonId === l.id ? ' option-btn-active' : ''}`}
-                onClick={() => setLessonId(l.id)}
-              >
-                {l.name}
-              </button>
+          <legend className="setup-legend">Learning Plan</legend>
+          <select
+            value={selectedPlan}
+            onChange={(e) => handlePlanChange(e.target.value)}
+            className="setup-select"
+            aria-label="Select learning plan"
+          >
+            {LEARNING_PLANS.map(plan => (
+              <option key={plan.path} value={plan.path}>
+                {plan.path}
+              </option>
             ))}
-          </div>
+          </select>
+        </fieldset>
+
+        {lessonsInPlan.length > 0 && (
+          <fieldset className="setup-field">
+            <legend className="setup-legend">Lessons (select one or more)</legend>
+            <div className="option-group">
+              {lessonsInPlan.map(lesson => (
+                <button
+                  key={lesson.id}
+                  type="button"
+                  className={`option-btn${selectedLessonIds.includes(lesson.id) ? ' option-btn-active' : ''}`}
+                  onClick={() => toggleLessonId(lesson.id)}
+                >
+                  {lesson.name}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        )}
+
+        <fieldset className="setup-field">
+          <legend className="setup-legend">Or Enter Custom</legend>
+          <input
+            type="text"
+            value={customCharacters}
+            onChange={(e) => {
+              setCustomCharacters(e.target.value)
+              if (e.target.value.trim() !== '') {
+                setSelectedLessonIds([])
+              }
+            }}
+            placeholder="Enter characters (e.g., ABC or A B C)"
+            className="setup-input"
+            aria-label="Enter custom characters to practice"
+          />
+          <p className="setup-hint">Enter characters separated by spaces or commas, or just type them together.</p>
+          {invalidTokens.length > 0 && (
+            <p className="setup-hint" role="status" aria-live="polite">
+              Unsupported: {invalidTokens.join(', ')}
+            </p>
+          )}
         </fieldset>
 
         <div className="selection-card" aria-live="polite">
           <p className="selection-card-kicker">Current Selection</p>
-          <p className="selection-card-title">{selectedLesson?.name ?? 'Character Set'}</p>
+          <p className="selection-card-title">
+            {isCustom 
+              ? 'Custom Characters' 
+              : selectedLessons.length === 0
+              ? 'No Lessons Selected'
+              : selectedLessons.length === 1
+              ? selectedLessons[0].name
+              : `${selectedLessons.length} Lessons Selected`}
+          </p>
           <p className="selection-card-meta">
-            {selectedLesson?.path ? `${selectedLesson.path} · ` : ''}
+            {selectedPlan ? `${selectedPlan} · ` : ''}
             {selectedMode?.label ?? 'Listen & Identify'} · {length} items ·{' '}
             {autoAdvance ? 'Auto advance' : 'Manual advance'}
           </p>
-          {selectedLesson?.description && (
-            <p className="selection-card-description">{selectedLesson.description}</p>
+          {selectedLessons.length > 0 && (
+            <>
+              <p className="selection-card-description">
+                {selectedLessons.map(l => l.description).filter(Boolean)[0]}
+              </p>
+              {selectedLessons.length > 1 && (
+                <p className="selection-card-description">
+                  Total characters: {selectedCharacters.length}
+                </p>
+              )}
+            </>
           )}
-          <div className="character-chip-row" aria-label="Selected characters">
-            {(selectedLesson?.characters ?? []).map(character => (
-              <span key={character} className="character-chip">
-                {character}
-              </span>
-            ))}
-          </div>
+          {selectedCharacters.length > 0 && (
+            <div className="character-chip-row" aria-label="Selected characters">
+              {selectedCharacters.slice(0, 20).map(character => (
+                <span key={character} className="character-chip">
+                  {character}
+                </span>
+              ))}
+              {selectedCharacters.length > 20 && (
+                <span className="character-chip">+{selectedCharacters.length - 20}</span>
+              )}
+            </div>
+          )}
         </div>
 
         <fieldset className="setup-field">
@@ -117,14 +221,20 @@ export default function PracticeSetupScreen({ onBack, onStart }) {
       </div>
 
       <div className="setup-actions">
-        <TouchButton onClick={() => onStart({
-          mode,
-          lessonId,
-          lessonName: selectedLesson?.name ?? 'Character Set',
-          characters: selectedLesson?.characters ?? [],
-          length,
-          autoAdvance,
-        })}
+        <TouchButton 
+          onClick={() => onStart({
+            mode,
+            lessonId: selectedLessonIds.length > 1 ? 'custom' : (selectedLessonIds[0] || 'custom'),
+            lessonName: isCustom 
+              ? 'Custom Characters'
+              : selectedLessons.length === 1
+              ? selectedLessons[0].name
+              : `${selectedLessons.length} Lessons`,
+            characters: selectedCharacters,
+            length,
+            autoAdvance,
+          })}
+          disabled={selectedCharacters.length === 0}
         >
           Start
         </TouchButton>
