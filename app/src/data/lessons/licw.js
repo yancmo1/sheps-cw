@@ -1,1 +1,32 @@
-export const LICW_LESSONS = []
+export const LICW_LESSONS = [
+  {
+    id: 'licw-01',
+    name: 'LICW 1: K M',
+    family: 'licw',
+    path: 'Long Island CW Club',
+    characters: ['K', 'M'],
+    description: 'Start with two full-speed characters — learn by ear.',
+    recommendedWPM: 20,
+    recommendedFarnsworth: 12,
+  },
+  {
+    id: 'licw-02',
+    name: 'LICW 2: R',
+    family: 'licw',
+    path: 'Long Island CW Club',
+    characters: ['K', 'M', 'R'],
+    description: 'Add R — continue with earlier characters.',
+    recommendedWPM: 20,
+    recommendedFarnsworth: 12,
+  },
+  {
+    id: 'licw-03',
+    name: 'LICW 3: S',
+    family: 'licw',
+    path: 'Long Island CW Club',
+    characters: ['K', 'M', 'R', 'S'],
+    description: 'Add S — review earlier combinations.',
+    recommendedWPM: 20,
+    recommendedFarnsworth: 12,
+  },
+]

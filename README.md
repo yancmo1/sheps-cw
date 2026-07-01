@@ -4,6 +4,12 @@ A modern Morse Code (CW) training project with a touch-first Dit Dit app and a l
 
 The project is being developed with a **core-first** architecture, allowing the Morse engine to remain independent from the user interface, audio system, and hardware platform. While the initial target is Raspberry Pi appliance deployment, the long-term goal is dedicated hardware.
 
+**Project & Product Names**:
+
+- **Dit Dit**: The React/Vite app and main CW trainer product (W5XY Labs brand)
+- **Dit Dit Box**: The Raspberry Pi appliance deployment of Dit Dit
+- **Didah Method**: The friendly learning methodology and educational approach
+
 ---
 
 # Project Goals
@@ -68,69 +74,67 @@ docs/
 
 ---
 
-# Planned Features
+# Current App Status
 
-## Training
+## What's Working
 
-- Character Trainer
-- Koch Method
-- Farnsworth Timing
-- Adaptive Learning
-- Character Review
-- Custom Lessons
+Dit Dit is a touch-first Morse code training app with browser-based audio and local persistence. The current release includes:
 
-## Practice
+- **Audio**: Browser-based Morse audio generation with adjustable tone and speed (Farnsworth timing support)
+- **Practice**: Touch-friendly practice session interface with visual and audio feedback
+- **Lessons**: Multiple lesson paths including Beginner, Koch Method, LICW, Numbers, and Review
+- **Persistence**: Local settings (speed, tone, volume) and practice history saved in browser
+- **Missed-Character Practice**: Focused practice on characters you got wrong
+- **Navigation**: Touch-first home screen with Practice, Progress, Settings, and Exit flows
+- **Pi Integration**: Ready for deployment on Raspberry Pi touchscreen with kiosk/exit behavior
 
-- Practice Oscillator
-- Random Character Generator
-- Word Practice
-- Callsign Practice
-- QSO Practice
+## Non-Goals (Until Core Engine Exists)
 
-## Analysis
-
-- Session Statistics
-- Accuracy Tracking
-- Learning History
-- Character Weakness Analysis
-- Progress Dashboard
-
-## Hardware
-
-- Keyboard Input
-- Paddle Support
-- Straight Key Support
-- GPIO Integration
-- Audio Output
-- Hardware Abstraction Layer (HAL)
+- GPIO hardware key/paddle input
+- Adaptive learning (static lessons only for now)
+- Backend services or user accounts
+- Full scoring/analytics
 
 ---
 
-# Local and Pi Commands
+# Development: Quick Start
 
-From repository root:
+## Local Development
+
+From `app/` directory:
 
 ```bash
-npm run ditdit:install
-npm run ditdit:dev
-npm run ditdit:build
-npm run ditdit:preview
-
-npm run pi:build-image
-npm run pi:start
-npm run pi:stop
-npm run pi:logs
-npm run pi:kiosk
+cd app
+npm install
+npm run dev
 ```
 
-Local Docker convenience:
+Browser opens at `http://localhost:5173`.
+
+## Local Docker
+
+From repository root, build and serve on port `8080`:
 
 ```bash
 docker compose -f docker-compose.local.yml up -d --build
+```
+
+Visit `http://localhost:8080`. Tear down with:
+
+```bash
 docker compose -f docker-compose.local.yml down
 ```
 
-The root `docker-compose.local.yml` is for local/dev convenience and serves the active app on host port `8080`. The Pi appliance deployment uses `deploy/pi/docker-compose.yml` and serves Dit Dit Box at `http://localhost:3000`.
+## Pi Deployment
+
+The active app builds into Dit Dit Box appliance through `deploy/pi/`:
+
+```bash
+docker compose -f deploy/pi/docker-compose.yml build
+docker compose -f deploy/pi/docker-compose.yml up -d
+```
+
+Dit Dit Box serves at `http://localhost:3000` on the Pi and launches in kiosk mode with exit-to-desktop support.
 
 Pi appliance install path expectation:
 
@@ -144,45 +148,65 @@ Current development platform:
 
 - macOS
 - Visual Studio Code
-- Obsidian (documentation)
+- Obsidian (documentation in `docs/`)
 - Excalidraw (architecture diagrams)
 - GitHub (source control)
 
-Initial keyboard controls:
+Initial audio controls:
 
 - **Space** = Dit
 - **Enter** = Dah
 
-GPIO support will be introduced after the core engine is complete.
+(GPIO hardware input support will be added after the core engine is complete.)
 
 ---
 
 # Current Status
 
-🚧 Active app shell + Pi deployment phase.
+**Phase**: Active app foundation + Pi deployment testing.
 
-Current focus:
+**Current Focus**:
 
-- Keep one canonical app path (`app/`)
-- Maintain clean Pi deployment flow under `deploy/pi/`
-- Continue kiosk startup/exit hardening and training-flow iteration
-- Preserve core-first architecture direction for future modules
+1. Verify touch-first practice flow works smoothly on Pi touchscreen
+2. Harden kiosk startup (cancel-to-desktop behavior)
+3. Test local persistence and multi-session workflows
+4. Begin extracting reusable Morse engine modules to `src/` (preparation for core-first architecture)
+
+**Single Source of Truth**:
+
+- `app/` = canonical Dit Dit React app
+- `deploy/pi/` = Dit Dit Box appliance layer
+- `legacy/app-prototype/` = archived (reference only)
 
 ---
 
-# Roadmap
+# Development Roadmap
 
-- [x] Repository created
-- [x] Documentation structure established
-- [ ] Core project scaffold
-- [ ] Morse timing engine
-- [ ] Character generation
+**See [ROADMAP_AND_CHECKLIST.md](docs/ROADMAP_AND_CHECKLIST.md) for detailed, trackable implementation plan organized by phase.**
+
+This document contains:
+- ✅ Completed work (what's already in the app)
+- 🔴 Phase 1: Critical Foundation (weeks 1–4)
+- 🟡 Phase 2: Learning Intelligence (weeks 5–8)
+- 🟢 Phase 3: Polish & Engagement (weeks 9–12)
+- 🟣 Phase 4: Advanced Features (week 13+)
+
+Each item includes acceptance criteria and dependencies.
+
+---
+
+### Quick Status
+
+- [x] Touch-first app foundation + browser audio
+- [x] Local persistence (settings + progress history)
+- [x] Multiple lesson paths (Beginner, Koch, LICW, Numbers, Review)
+- [x] Raspberry Pi deployment + kiosk integration
+- [ ] Comprehensive character coverage (26 letters + digits)
+- [ ] Structured 40+ lesson library
 - [ ] Adaptive learning engine
-- [ ] Statistics engine
-- [ ] Audio subsystem
-- [ ] Desktop UI
-- [ ] Raspberry Pi integration
-- [ ] Hardware prototype
+- [ ] Core Morse engine extraction (reusable, testable)
+
+See **[ROADMAP_AND_CHECKLIST.md](docs/ROADMAP_AND_CHECKLIST.md)** for actionable next steps.
 
 ---
 
