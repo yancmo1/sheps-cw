@@ -1,6 +1,6 @@
 import TouchButton from '../components/TouchButton.jsx'
 
-export default function HomeScreen({ onPractice, onProgress, onSettings, onExit }) {
+export default function HomeScreen({ onPractice, onKeyDecode, onProgress, onSettings, onExit }) {
   return (
     <section className="home-screen" aria-labelledby="home-title">
       <p className="brand-kicker">W5XY Labs</p>
@@ -9,6 +9,7 @@ export default function HomeScreen({ onPractice, onProgress, onSettings, onExit 
 
       <div className="action-stack" aria-label="Main navigation">
         <TouchButton onClick={onPractice}>Practice</TouchButton>
+        <TouchButton onClick={onKeyDecode}>Key Decode</TouchButton>
         <TouchButton onClick={onProgress}>Progress</TouchButton>
         <TouchButton onClick={onSettings}>Settings</TouchButton>
         <TouchButton variant="secondary" onClick={onExit}>Exit to Desktop</TouchButton>

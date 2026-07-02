@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import TouchButton from '../components/TouchButton.jsx'
+import LessonPlanPicker from '../components/LessonPlanPicker.jsx'
 import { LESSONS } from '../data/lessons/index.js'
 import { parseCharacterInput } from '../core/codec/charsetCodec.js'
 
@@ -60,12 +61,10 @@ export default function PracticeSetupScreen({ onBack, onStart }) {
 
   return (
     <section className="screen" aria-labelledby="setup-title">
-      <div className="screen-header">
+      <div className="setup-header">
         <TouchButton variant="secondary" size="sm" onClick={onBack}>← Back</TouchButton>
-        <p className="screen-kicker">Dit Dit</p>
+        <h1 id="setup-title" className="setup-title">Practice Setup</h1>
       </div>
-
-      <h1 id="setup-title" className="screen-title">Practice Setup</h1>
 
       <div className="setup-form">
         <fieldset className="setup-field">
@@ -86,18 +85,12 @@ export default function PracticeSetupScreen({ onBack, onStart }) {
 
         <fieldset className="setup-field">
           <legend className="setup-legend">Learning Plan</legend>
-          <select
+          <LessonPlanPicker
             value={selectedPlan}
-            onChange={(e) => handlePlanChange(e.target.value)}
-            className="setup-select"
-            aria-label="Select learning plan"
-          >
-            {LEARNING_PLANS.map(plan => (
-              <option key={plan.path} value={plan.path}>
-                {plan.path}
-              </option>
-            ))}
-          </select>
+            options={LEARNING_PLANS}
+            onChange={handlePlanChange}
+            label="Select learning plan"
+          />
         </fieldset>
 
         {lessonsInPlan.length > 0 && (
@@ -141,47 +134,31 @@ export default function PracticeSetupScreen({ onBack, onStart }) {
           )}
         </fieldset>
 
-        <div className="selection-card" aria-live="polite">
-          <p className="selection-card-kicker">Current Selection</p>
-          <p className="selection-card-title">
-            {isCustom 
-              ? 'Custom Characters' 
-              : selectedLessons.length === 0
-              ? 'No Lessons Selected'
-              : selectedLessons.length === 1
-              ? selectedLessons[0].name
-              : `${selectedLessons.length} Lessons Selected`}
-          </p>
-          <p className="selection-card-meta">
-            {selectedPlan ? `${selectedPlan} · ` : ''}
-            {selectedMode?.label ?? 'Listen & Identify'} · {length} items ·{' '}
-            {autoAdvance ? 'Auto advance' : 'Manual advance'}
-          </p>
-          {selectedLessons.length > 0 && (
-            <>
-              <p className="selection-card-description">
-                {selectedLessons.map(l => l.description).filter(Boolean)[0]}
-              </p>
-              {selectedLessons.length > 1 && (
-                <p className="selection-card-description">
-                  Total characters: {selectedCharacters.length}
-                </p>
-              )}
-            </>
-          )}
-          {selectedCharacters.length > 0 && (
-            <div className="character-chip-row" aria-label="Selected characters">
-              {selectedCharacters.slice(0, 20).map(character => (
-                <span key={character} className="character-chip">
-                  {character}
-                </span>
-              ))}
-              {selectedCharacters.length > 20 && (
-                <span className="character-chip">+{selectedCharacters.length - 20}</span>
-              )}
-            </div>
-          )}
-        </div>
+        {/* Only show selection card when there's a meaningful selection or custom input */}
+        {(selectedCharacters.length > 0) && (
+          <div 
+            key={`${selectedLessonIds.join('-')}-${customCharacters}-${length}`}
+            className="selection-card selection-card-compact selection-card-animate" 
+            aria-live="polite"
+          >
+            <p className="selection-card-meta">
+              {selectedMode?.label ?? 'Listen & Identify'} · {selectedCharacters.length} characters · {length} items
+            </p>
+            {/* Character preview - purely decorative, not interactive */}
+            {selectedCharacters.length > 0 && (
+              <div className="character-chip-row" aria-label="Selected characters">
+                {selectedCharacters.slice(0, 16).map(character => (
+                  <span key={character} className="character-chip">
+                    {character}
+                  </span>
+                ))}
+                {selectedCharacters.length > 16 && (
+                  <span className="character-chip">+{selectedCharacters.length - 16}</span>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         <fieldset className="setup-field">
           <legend className="setup-legend">Session Length</legend>

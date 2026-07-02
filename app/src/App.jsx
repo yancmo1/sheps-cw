@@ -7,6 +7,7 @@ import ResultsScreen from './screens/ResultsScreen.jsx'
 import ProgressScreen from './screens/ProgressScreen.jsx'
 import SettingsScreen from './screens/SettingsScreen.jsx'
 import ExitScreen from './screens/ExitScreen.jsx'
+import KeyDecodeScreen from './screens/KeyDecodeScreen.jsx'
 
 export default function App() {
   const [screen, setScreen] = useState('home')
@@ -72,9 +73,17 @@ export default function App() {
       {screen === 'home' && (
         <HomeScreen
           onPractice={() => setScreen('practiceSetup')}
+          onKeyDecode={() => setScreen('keyDecode')}
           onProgress={() => setScreen('progress')}
           onSettings={() => setScreen('settings')}
           onExit={() => setScreen('exit')}
+        />
+      )}
+
+      {screen === 'keyDecode' && (
+        <KeyDecodeScreen
+          settings={settings}
+          onBack={goHome}
         />
       )}
 

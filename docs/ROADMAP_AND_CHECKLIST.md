@@ -1,12 +1,12 @@
 # Dit Dit: Roadmap & Implementation Checklist
 
 **Last Updated:** July 1, 2026  
-**Status:** Phase 1 content + UX + core extraction complete; adaptive foundation next  
+**Status:** Phase 1 content + UX + core extraction + live CW input decode complete; adaptive foundation next  
 **Reference Document:** [Dit_Dit_Design_Review_and_Improvements.md](Dit_Dit_Design_Review_and_Improvements.md) (archived June 29 — comprehensive 40+ improvement opportunities, basis for this checklist)
 
 ---
 
-## Phase 1 Progress: 75% Complete
+## Phase 1 Progress: 80% Complete
 
 **Content & UX (✅ Complete)**
 - Expanded to 42 lessons across 9 learning paths
@@ -33,9 +33,12 @@ Core foundation is in place:
 - [x] Local settings persistence (speed, tone, volume)
 - [x] Local progress history and basic statistics
 - [x] Missed-character practice loop
-- [x] Home screen with Practice, Progress, Settings, Exit flows
+- [x] Home screen with Practice, Key Decode, Progress, Settings, Exit flows
 - [x] Docker deployment + Pi kiosk integration
 - [x] Basic keyboard input support (Space = Dit, Enter = Dah)
+- [x] Live key-decode screen with straight-key and paddle support
+- [x] Iambic A/B paddle mode selection and sidetone
+- [x] Character-speed tracking with last/average WPM feedback
 
 **Architecture in place:**
 
@@ -80,6 +83,17 @@ Core foundation is in place:
   - [x] **Acceptance:** 42 lessons available, organized by Learning Plans, users can multiselect
 
 ### Practice Setup UX ✅
+
+### Live Input Decode & Speed Feedback ✅
+
+- [x] Add a dedicated Key Decode screen to Home navigation
+- [x] Support straight-key input via keyboard and touch key
+- [x] Support dual-paddle input with Iambic A/B selection
+- [x] Show live Morse decoding, transcript, and pattern feedback while keying
+- [x] Add sidetone while keying for a more realistic feel
+- [x] Track character speed and show last/average WPM feedback
+- [x] Acceptance: users can practice sending CW and immediately see decoded characters plus speed feedback
+
 
 - [x] **Organize Practice Setup by Learning Plans**
   - [x] Extract unique learning paths from lesson data

@@ -4,12 +4,59 @@ import { getMorseUnitSeconds } from '../core/morseTiming.js'
 export { getMorseUnitSeconds, getPostCharacterDelayMs } from '../core/morseTiming.js'
 
 let audioCtx = null
+let sidetoneOsc = null
+let sidetoneGain = null
 
 function getContext() {
   if (!audioCtx || audioCtx.state === 'closed') {
     audioCtx = new AudioContext()
   }
   return audioCtx
+}
+
+function clamp01(value) {
+  return Math.max(0, Math.min(1, value))
+}
+
+export async function startSidetone({ frequency = 600, volume = 80 } = {}) {
+  if (sidetoneOsc) return
+
+  const ctx = getContext()
+  if (ctx.state === 'suspended') {
+    await ctx.resume()
+  }
+
+  const gainLevel = clamp01(volume / 100)
+  const now = ctx.currentTime
+
+  sidetoneGain = ctx.createGain()
+  sidetoneGain.gain.setValueAtTime(0, now)
+  sidetoneGain.gain.linearRampToValueAtTime(gainLevel, now + 0.004)
+  sidetoneGain.connect(ctx.destination)
+
+  sidetoneOsc = ctx.createOscillator()
+  sidetoneOsc.type = 'sine'
+  sidetoneOsc.frequency.setValueAtTime(frequency, now)
+  sidetoneOsc.connect(sidetoneGain)
+  sidetoneOsc.start(now)
+}
+
+export function stopSidetone() {
+  if (!sidetoneOsc) return
+
+  const ctx = getContext()
+  const now = ctx.currentTime
+  sidetoneGain?.gain.cancelScheduledValues(now)
+  sidetoneGain?.gain.setValueAtTime(sidetoneGain.gain.value, now)
+  sidetoneGain?.gain.linearRampToValueAtTime(0, now + 0.01)
+
+  sidetoneOsc.stop(now + 0.012)
+  sidetoneOsc.onended = () => {
+    sidetoneOsc?.disconnect()
+    sidetoneGain?.disconnect()
+    sidetoneOsc = null
+    sidetoneGain = null
+  }
 }
 
 /**
@@ -31,7 +78,7 @@ export async function playCharacter(char, { wpm = 20, frequency = 600, volume = 
     await ctx.resume()
   }
 
-  const gainLevel = Math.max(0, Math.min(1, volume / 100))
+  const gainLevel = clamp01(volume / 100)
   const unit = getMorseUnitSeconds(wpm)
   // Short ramp to prevent clicks; clamp to 10% of a dit duration
   const ramp = Math.min(0.005, unit * 0.1)
