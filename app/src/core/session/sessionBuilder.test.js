@@ -42,6 +42,21 @@ describe('sessionBuilder', () => {
     }
   })
 
+  it('uses weighted character pools when provided', () => {
+    const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0)
+
+    const items = buildItems(['A', 'B'], 2, {
+      weightedCharacters: ['A', 'A', 'A', 'B'],
+      fallbackCharacters: ['C'],
+    })
+
+    expect(items).toHaveLength(2)
+    expect(items[0].char).toBe('A')
+    expect(items[1].char).toBe('A')
+
+    randomSpy.mockRestore()
+  })
+
   it('creates deterministic fallback session IDs when crypto.randomUUID is unavailable', () => {
     const originalNow = Date.now
     const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.123456789)
@@ -71,9 +86,9 @@ describe('sessionBuilder', () => {
   it('calculates session result summary including misses and accuracy', () => {
     const result = calculateSessionResult({
       completedItems: [
-        { character: 'A', selected: 'A', correct: true },
-        { character: 'B', selected: 'C', correct: false },
-        { character: 'B', selected: 'D', correct: false },
+        { character: 'A', selected: 'A', correct: true, responseMs: 800 },
+        { character: 'B', selected: 'C', correct: false, responseMs: 1200 },
+        { character: 'B', selected: 'D', correct: false, responseMs: 1000 },
       ],
       config: { mode: 'identify', length: 3, lessonName: 'Lesson A' },
       lesson: { id: 'lesson-a', name: 'Lesson A' },
@@ -92,6 +107,8 @@ describe('sessionBuilder', () => {
       correct: 1,
       accuracy: 33,
       missed: ['B'],
+      avgResponseMs: 1000,
+      timingSampleCount: 3,
       characters: ['A', 'B', 'C'],
     })
     expect(result.items).toHaveLength(3)

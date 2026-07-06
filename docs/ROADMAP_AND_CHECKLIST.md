@@ -138,23 +138,23 @@ Core foundation is in place:
 
 ### Adaptive Learning Foundation
 
-- [ ] **Add per-character accuracy tracking**
-  - [ ] Store accuracy for each character across all sessions
-  - [ ] Track rolling accuracy (last 10, 50, 100 exposures)
-  - [ ] Flag characters <80% as "weak"
-  - [ ] **Acceptance:** Progress screen shows per-character accuracy heatmap
+- [x] **Add per-character accuracy tracking** → Completed 2026-07-02
+  - [x] Store accuracy for each character across all sessions
+  - [x] Track rolling accuracy (last 10, 50, 100 exposures)
+  - [x] Flag characters <80% as "weak"
+  - [x] **Acceptance:** Progress screen shows per-character accuracy heatmap
 
-- [ ] **Implement weak character detection**
-  - [ ] Identify characters below threshold automatically
-  - [ ] Create automatic "Weak Character Practice" session
-  - [ ] Increase frequency of weak characters in standard lessons
-  - [ ] **Acceptance:** User can click "Practice Weak Characters" and drill specific chars
+- [x] **Implement weak character detection** → Completed 2026-07-02
+  - [x] Identify characters below threshold automatically
+  - [x] Create automatic "Weak Character Practice" session
+  - [x] Increase frequency of weak characters in standard lessons
+  - [x] **Acceptance:** User can click "Practice Weak Characters" and drill specific chars
 
-- [ ] **Add character confusion detection**
-  - [ ] Identify common confusion pairs (E/T, S/H, etc.)
-  - [ ] Log when user misidentifies one char as another
-  - [ ] Show confusion patterns in Progress screen
-  - [ ] **Acceptance:** User sees "Often confuse E with T" on Progress
+- [x] **Add character confusion detection** → Completed 2026-07-02
+  - [x] Identify common confusion pairs (E/T, S/H, etc.)
+  - [x] Log when user misidentifies one char as another
+  - [x] Show confusion patterns in Progress screen
+  - [x] **Acceptance:** User sees "Often confuse E with T" on Progress
 
 ### Pi Kiosk & Exit Flow
 
@@ -226,103 +226,103 @@ Core foundation is in place:
 
 ### Spaced Repetition
 
-- [ ] **Implement spaced repetition algorithm (SM-2 or Leitner)**
-  - [ ] Track per-character: easeFactor, interval, repetitions, nextReview
-  - [ ] Schedule character reviews based on performance
-  - [ ] Increase interval on success, decrease on failure
-  - [ ] Create daily review deck from due items
-  - [ ] **Acceptance:** Characters show in practice with correct spacing; review status visible in Progress
+- [x] **Implement spaced repetition algorithm (SM-2 or Leitner)**
+  - [x] Track per-character: easeFactor, interval, repetitions, nextReview
+  - [x] Schedule character reviews based on performance
+  - [x] Increase interval on success, decrease on failure
+  - [x] Create daily review deck from due items
+  - [x] **Acceptance:** Characters show in practice with correct spacing; review status visible in Progress
 
-- [ ] **Add "Due for Review" indicator**
-  - [ ] Show count of characters due today on Home screen
-  - [ ] Create "Daily Review" quick-start option
-  - [ ] Track which characters user practiced today
-  - [ ] **Acceptance:** User can see "3 characters due for review today" and practice them
+- [x] **Add "Due for Review" indicator**
+  - [x] Show count of characters due today on Home screen
+  - [x] Create "Daily Review" quick-start option
+  - [x] Track which characters user practiced today
+  - [x] **Acceptance:** User can see "3 characters due for review today" and practice them
 
 ### Dynamic Difficulty Adjustment
 
-- [ ] **Implement dynamic speed adjustment**
-  - [ ] Increase WPM when session accuracy >95%
-  - [ ] Decrease WPM when accuracy <70%
-  - [ ] Adjust gradually (±1-2 WPM per session)
-  - [ ] Show speed recommendation on Results screen
-  - [ ] **Acceptance:** User's speed gradually increases as they improve
+- [x] **Implement dynamic speed adjustment**
+  - [x] Increase WPM when session accuracy >95%
+  - [x] Decrease WPM when accuracy <70%
+  - [x] Adjust gradually (±1-2 WPM per session)
+  - [x] Show speed recommendation on Results screen
+  - [x] **Acceptance:** User's speed gradually increases as they improve
 
-- [ ] **Dynamic character set adjustment**
-  - [ ] Add more confusing characters when mastery is high
-  - [ ] Reduce character set when user struggling
-  - [ ] Adjust Farnsworth timing based on performance
-  - [ ] **Acceptance:** Practice feels "just right" difficulty-wise
+- [x] **Dynamic character set adjustment**
+  - [x] Add more confusing characters when mastery is high
+  - [x] Reduce character set when user struggling
+  - [x] Adjust Farnsworth timing based on performance
+  - [x] **Acceptance:** Practice feels "just right" difficulty-wise
 
 ### New Practice Modes
 
-- [ ] **Implement Copy Mode (user types what they hear)**
-  - [ ] Show input field or on-screen keyboard
-  - [ ] Play Morse, user types character
-  - [ ] Score accuracy and timing
-  - [ ] Support both keyboard and touch input
-  - [ ] **Acceptance:** User can select Copy Mode and complete practice session
+- [x] **Implement Copy Mode (user types what they hear)**
+  - [x] Show input field or on-screen keyboard
+  - [x] Play Morse, user types character
+  - [x] Score accuracy and timing
+  - [x] Support both keyboard and touch input
+  - [x] **Acceptance:** User can select Copy Mode and complete practice session
 
-- [ ] **Create Speed Ladder drills**
-  - [ ] Same lesson, increasing WPM per round
-  - [ ] Show current WPM on screen
-  - [ ] Stop when accuracy falls below threshold
-  - [ ] Display final WPM achieved
-  - [ ] **Acceptance:** User can run speed ladder, see how high they can go
+- [x] **Create Speed Ladder drills**
+  - [x] Same lesson, increasing WPM per round
+  - [x] Show current WPM on screen
+  - [x] Stop when accuracy falls below threshold
+  - [x] Display final WPM achieved
+  - [x] **Acceptance:** User can run speed ladder, see how high they can go
 
 ### Audio Improvements
 
 - [ ] **Improve tone quality (eliminate clicks/pops)**
-  - [ ] Add attack/decay envelope (fade-in, fade-out)
-  - [ ] Smooth ramp-up/ramp-down of tone
+  - [x] Add attack/decay envelope (fade-in, fade-out)
+  - [x] Smooth ramp-up/ramp-down of tone
   - [ ] Test audio on Pi speakers and desktop
   - [ ] **Acceptance:** No audible clicks at start/end of tones
 
 - [ ] **Add audio envelope controls**
-  - [ ] Allow users to adjust attack (0-50ms)
-  - [ ] Allow users to adjust decay (0-50ms)
+  - [x] Allow users to adjust attack (0-50ms)
+  - [x] Allow users to adjust decay (0-50ms)
   - [ ] Preview tone when changing settings
-  - [ ] **Acceptance:** User can customize tone envelope in Settings
+  - [x] **Acceptance:** User can customize tone envelope in Settings
 
 - [ ] **Add frequency randomization option**
-  - [ ] Optional +/- 50Hz per character (simulates real QSB)
-  - [ ] Include frequency variation practice mode
-  - [ ] **Acceptance:** User can enable frequency variation in Settings
+  - [x] Optional +/- 50Hz per character (simulates real QSB)
+  - [x] Include frequency variation practice mode
+  - [x] **Acceptance:** User can enable frequency variation in Settings
 
 ### Progress Screen Enhancements
 
-- [ ] **Add accuracy trend graph**
-  - [ ] Display accuracy over time (last 10, 30, all-time sessions)
-  - [ ] Show trend line (improving/stable/declining)
-  - [ ] **Acceptance:** User can see if they're improving
+- [x] **Add accuracy trend graph**
+  - [x] Display accuracy over time (last 10, 30, all-time sessions)
+  - [x] Show trend line (improving/stable/declining)
+  - [x] **Acceptance:** User can see if they're improving
 
-- [ ] **Add per-character mastery heatmap**
-  - [ ] Visual grid showing accuracy per character
-  - [ ] Color-code: green (strong), yellow (ok), red (weak)
-  - [ ] Click to drill that character
-  - [ ] **Acceptance:** User sees at a glance which chars need work
+- [x] **Add per-character mastery heatmap**
+  - [x] Visual grid showing accuracy per character
+  - [x] Color-code: green (strong), yellow (ok), red (weak)
+  - [x] Click to drill that character
+  - [x] **Acceptance:** User sees at a glance which chars need work
 
-- [ ] **Show learning streak**
-  - [ ] Consecutive days practiced
-  - [ ] Display on home screen and Progress
-  - [ ] **Acceptance:** Streak visible; user motivated to maintain it
+- [x] **Show learning streak**
+  - [x] Consecutive days practiced
+  - [x] Display on home screen and Progress
+  - [x] **Acceptance:** Streak visible; user motivated to maintain it
 
 ### Motivation & Engagement
 
-- [ ] **Add streak tracking**
-  - [ ] Track consecutive days with at least one practice session
-  - [ ] Show current streak on Home screen
-  - [ ] Display longest streak in Progress
-  - [ ] **Acceptance:** Streak displays correctly; updates daily
+- [x] **Add streak tracking**
+  - [x] Track consecutive days with at least one practice session
+  - [x] Show current streak on Home screen
+  - [x] Display longest streak in Progress
+  - [x] **Acceptance:** Streak displays correctly; updates daily
 
 - [ ] **Create achievement system (Phase 2 starter pack)**
-  - [ ] First session complete
-  - [ ] 10 sessions complete
-  - [ ] First perfect session (100%)
-  - [ ] Master a character (100% last 20 exposures)
-  - [ ] Reach 20 WPM
-  - [ ] Display earned badges in Progress screen
-  - [ ] **Acceptance:** User earns 1-2 achievements in normal use; sees them
+  - [x] First session complete
+  - [x] 10 sessions complete
+  - [x] First perfect session (100%)
+  - [x] Master a character (100% last 20 exposures)
+  - [x] Reach 20 WPM
+  - [x] Display earned badges in Progress screen
+  - [x] **Acceptance:** User earns 1-2 achievements in normal use; sees them
 
 ---
 
@@ -351,11 +351,11 @@ Core foundation is in place:
 
 ### Settings & Customization
 
-- [ ] **Add theme selector (dark/light/high-contrast)**
-  - [ ] Store preference in localStorage
-  - [ ] Apply on next app load
-  - [ ] High-contrast option meets WCAG AAA
-  - [ ] **Acceptance:** User can choose theme; persists across sessions
+- [x] **Add theme selector (dark/light/high-contrast)**
+  - [x] Store preference in localStorage
+  - [x] Apply on next app load
+  - [x] High-contrast option meets WCAG AAA
+  - [x] **Acceptance:** User can choose theme; persists across sessions
 
 - [ ] **Add keyboard shortcut customization**
   - [ ] Let user reassign Dit/Dah keys
@@ -364,69 +364,69 @@ Core foundation is in place:
   - [ ] **Acceptance:** User can change keys and use immediately
 
 - [ ] **Create session length presets**
-  - [ ] Expand beyond current 5/10/15 to include 20, 30, 45, 60
-  - [ ] Add "Quick 2-minute" and "Marathon 100-char" options
-  - [ ] **Acceptance:** User can select various session lengths
+  - [x] Expand beyond current 5/10/15 to include 20, 30, 45, 60
+  - [x] Add "Quick 2-minute" and "Marathon 100-char" options
+  - [x] **Acceptance:** User can select various session lengths
 
 - [ ] **Add accessibility options**
-  - [ ] Large text mode (1.5x-2x)
-  - [ ] Disable animations toggle
-  - [ ] Increase touch target size option
-  - [ ] **Acceptance:** Large text readable; animations off when disabled
+  - [x] Large text mode (1.5x-2x)
+  - [x] Disable animations toggle
+  - [x] Increase touch target size option
+  - [x] **Acceptance:** Large text readable; animations off when disabled
 
 ### Results Screen Improvements
 
-- [ ] **Add visual accuracy gauge/dial**
-  - [ ] Show accuracy on prettier visual display (not just %)
-  - [ ] Color-code feedback (red <60%, yellow <85%, green ≥85%)
-  - [ ] **Acceptance:** Results feel more rewarding
+- [x] **Add visual accuracy gauge/dial**
+  - [x] Show accuracy on prettier visual display (not just %)
+  - [x] Color-code feedback (red <60%, yellow <85%, green ≥85%)
+  - [x] **Acceptance:** Results feel more rewarding
 
-- [ ] **Surface specific improvement recommendations**
-  - [ ] "Practice these 3 characters next"
-  - [ ] Link directly to weak character practice
-  - [ ] **Acceptance:** User can immediately action recommendations
+- [x] **Surface specific improvement recommendations**
+  - [x] "Practice these 3 characters next"
+  - [x] Link directly to weak character practice
+  - [x] **Acceptance:** User can immediately action recommendations
 
-- [ ] **Show streak continuation status**
-  - [ ] "Streak continues! 7 days in a row"
-  - [ ] Or "Streak lost. Start a new one today!"
-  - [ ] **Acceptance:** Streak status clear on Results
+- [x] **Show streak continuation status**
+  - [x] "Streak continues! 7 days in a row"
+  - [x] Or "Streak lost. Start a new one today!"
+  - [x] **Acceptance:** Streak status clear on Results
 
 ### Engagement Features
 
-- [ ] **Create daily challenges**
-  - [ ] Pre-configured session each day
-  - [ ] "Today's Challenge: 25 characters at 18 WPM"
-  - [ ] Reward completion with badge/streak bonus
-  - [ ] **Acceptance:** Challenge available daily; users engage
+- [x] **Create daily challenges**
+  - [x] Pre-configured session each day
+  - [x] "Today's Challenge: 25 characters at 18 WPM"
+  - [x] Reward completion with badge/streak bonus
+  - [x] **Acceptance:** Challenge available daily; users engage
 
-- [ ] **Implement additional achievements**
-  - [ ] Complete Koch Method (all 40 characters)
-  - [ ] Reach 20/25/30 WPM
-  - [ ] Practice at 5am (early bird)
-  - [ ] 1000 total characters practiced
-  - [ ] 30-day streak
-  - [ ] **Acceptance:** 8+ achievements available; users see them
+- [x] **Implement additional achievements**
+  - [x] Complete Koch Method (all 40 characters)
+  - [x] Reach 20/25/30 WPM
+  - [x] Practice at 5am (early bird)
+  - [x] 1000 total characters practiced
+  - [x] 30-day streak
+  - [x] **Acceptance:** 8+ achievements available; users see them
 
 ### Data & Privacy
 
 - [ ] **Add data export (JSON/CSV)**
-  - [ ] Export all progress history as JSON
-  - [ ] Export session summary as CSV
-  - [ ] Include "Download my data" button in Settings
-  - [ ] **Acceptance:** User can download their data; file is complete and readable
+  - [x] Export all progress history as JSON
+  - [x] Export session summary as CSV
+  - [x] Include "Download my data" button in Settings
+  - [x] **Acceptance:** User can download their data; file is complete and readable
 
 - [ ] **Add import capability**
-  - [ ] Restore from previously exported JSON backup
-  - [ ] Validate file format before import
-  - [ ] Show confirmation before overwriting
-  - [ ] **Acceptance:** User can restore from backup
+  - [x] Restore from previously exported JSON backup
+  - [x] Validate file format before import
+  - [x] Show confirmation before overwriting
+  - [x] **Acceptance:** User can restore from backup
 
 ### Accessibility
 
 - [ ] **Improve keyboard navigation**
   - [ ] Tab through all interactive elements in order
   - [ ] Enter/Space to activate buttons
-  - [ ] Number keys for answer choices
+  - [x] Number keys for answer choices
   - [ ] **Acceptance:** Keyboard-only user can complete full practice flow
 
 - [ ] **Add ARIA labels & screen reader support**

@@ -6,10 +6,22 @@ import { parseCharacterInput } from '../core/codec/charsetCodec.js'
 
 const MODES = [
   { id: 'identify', label: 'Listen & Identify' },
+  { id: 'copy', label: 'Copy Mode' },
+  { id: 'speed-ladder', label: 'Speed Ladder' },
   { id: 'listen', label: 'Listen Only' },
 ]
 
-const SESSION_LENGTHS = [5, 10, 15]
+const SESSION_PRESETS = [
+  { value: 2, label: 'Quick 2' },
+  { value: 5, label: '5' },
+  { value: 10, label: '10' },
+  { value: 15, label: '15' },
+  { value: 20, label: '20' },
+  { value: 30, label: '30' },
+  { value: 45, label: '45' },
+  { value: 60, label: '60' },
+  { value: 100, label: 'Marathon 100' },
+]
 
 // Extract unique learning paths/families
 const LEARNING_PLANS = Array.from(
@@ -163,14 +175,14 @@ export default function PracticeSetupScreen({ onBack, onStart }) {
         <fieldset className="setup-field">
           <legend className="setup-legend">Session Length</legend>
           <div className="option-group option-group-sm">
-            {SESSION_LENGTHS.map(n => (
+            {SESSION_PRESETS.map(preset => (
               <button
-                key={n}
+                key={preset.value}
                 type="button"
-                className={`option-btn${length === n ? ' option-btn-active' : ''}`}
-                onClick={() => setLength(n)}
+                className={`option-btn${length === preset.value ? ' option-btn-active' : ''}`}
+                onClick={() => setLength(preset.value)}
               >
-                {n}
+                {preset.label}
               </button>
             ))}
           </div>

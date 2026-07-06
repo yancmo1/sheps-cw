@@ -5,6 +5,13 @@ export const DEFAULT_SETTINGS = {
   farnsworth: 10,
   frequency: 600,
   volume: 80,
+  attackMs: 5,
+  decayMs: 5,
+  frequencyJitter: 0,
+  largeText: false,
+  reduceMotion: false,
+  largeTouchTargets: false,
+  theme: 'dark',
 }
 
 export function loadSettings() {

@@ -18,7 +18,18 @@ function clamp01(value) {
   return Math.max(0, Math.min(1, value))
 }
 
-export async function startSidetone({ frequency = 600, volume = 80 } = {}) {
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value))
+}
+
+function pickFrequencyWithJitter(baseFrequency, jitter = 0) {
+  const amount = Math.max(0, Number(jitter) || 0)
+  if (amount <= 0) return baseFrequency
+  const offset = (Math.random() * 2 - 1) * amount
+  return baseFrequency + offset
+}
+
+export async function startSidetone({ frequency = 600, volume = 80, attackMs = 5, decayMs = 5 } = {}) {
   if (sidetoneOsc) return
 
   const ctx = getContext()
@@ -31,7 +42,7 @@ export async function startSidetone({ frequency = 600, volume = 80 } = {}) {
 
   sidetoneGain = ctx.createGain()
   sidetoneGain.gain.setValueAtTime(0, now)
-  sidetoneGain.gain.linearRampToValueAtTime(gainLevel, now + 0.004)
+  sidetoneGain.gain.linearRampToValueAtTime(gainLevel, now + clamp((attackMs || 0) / 1000, 0, 0.05))
   sidetoneGain.connect(ctx.destination)
 
   sidetoneOsc = ctx.createOscillator()
@@ -69,7 +80,17 @@ export function stopSidetone() {
  * @param {number} settings.volume - Volume as a percentage (0–100).
  * @returns {Promise<void>} Resolves when playback is complete.
  */
-export async function playCharacter(char, { wpm = 20, frequency = 600, volume = 80 } = {}) {
+export async function playCharacter(
+  char,
+  {
+    wpm = 20,
+    frequency = 600,
+    volume = 80,
+    attackMs = 5,
+    decayMs = 5,
+    frequencyJitter = 0,
+  } = {}
+) {
   const pattern = encodeCharacter(char)
   if (!pattern) return
 
@@ -80,8 +101,10 @@ export async function playCharacter(char, { wpm = 20, frequency = 600, volume = 
 
   const gainLevel = clamp01(volume / 100)
   const unit = getMorseUnitSeconds(wpm)
-  // Short ramp to prevent clicks; clamp to 10% of a dit duration
-  const ramp = Math.min(0.005, unit * 0.1)
+  // Envelope ramps to prevent clicks, user-adjustable but bounded by element duration
+  const attack = clamp((attackMs || 0) / 1000, 0, 0.05)
+  const decay = clamp((decayMs || 0) / 1000, 0, 0.05)
+  const toneFrequency = pickFrequencyWithJitter(frequency, frequencyJitter)
 
   const gainNode = ctx.createGain()
   gainNode.gain.setValueAtTime(0, ctx.currentTime)
@@ -89,7 +112,7 @@ export async function playCharacter(char, { wpm = 20, frequency = 600, volume = 
 
   const osc = ctx.createOscillator()
   osc.type = 'sine'
-  osc.frequency.setValueAtTime(frequency, ctx.currentTime)
+  osc.frequency.setValueAtTime(toneFrequency, ctx.currentTime)
   osc.connect(gainNode)
 
   // Small lead-in so the first scheduled event is never in the past
@@ -97,10 +120,13 @@ export async function playCharacter(char, { wpm = 20, frequency = 600, volume = 
 
   for (let i = 0; i < pattern.length; i++) {
     const elDuration = pattern[i] === '-' ? 3 * unit : unit
+    const attackRamp = Math.min(attack, elDuration * 0.4)
+    const decayRamp = Math.min(decay, elDuration * 0.4)
+    const holdUntil = Math.max(t + attackRamp + 0.001, t + elDuration - decayRamp)
 
     gainNode.gain.setValueAtTime(0, t)
-    gainNode.gain.linearRampToValueAtTime(gainLevel, t + ramp)
-    gainNode.gain.setValueAtTime(gainLevel, Math.max(t + ramp + 0.001, t + elDuration - ramp))
+    gainNode.gain.linearRampToValueAtTime(gainLevel, t + attackRamp)
+    gainNode.gain.setValueAtTime(gainLevel, holdUntil)
     gainNode.gain.linearRampToValueAtTime(0, t + elDuration)
 
     t += elDuration

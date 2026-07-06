@@ -13,13 +13,22 @@ export function buildChoices(character, availableCharacters, fallbackCharacters 
   return shuffle([character, ...distractors])
 }
 
-export function buildItems(characters, length, { fallbackCharacters = [] } = {}) {
+export function buildItems(characters, length, {
+  fallbackCharacters = [],
+  weightedCharacters = null,
+} = {}) {
   if (!Array.isArray(characters) || characters.length === 0 || length <= 0) {
     return []
   }
 
+  const sourcePool = Array.isArray(weightedCharacters) && weightedCharacters.length > 0
+    ? weightedCharacters.filter(character => characters.includes(character))
+    : characters
+
+  const randomPool = sourcePool.length > 0 ? sourcePool : characters
+
   return Array.from({ length }, () => {
-    const char = characters[Math.floor(Math.random() * characters.length)]
+    const char = randomPool[Math.floor(Math.random() * randomPool.length)]
     return {
       char,
       choices: buildChoices(char, characters, fallbackCharacters),
@@ -44,6 +53,8 @@ export function calculateSessionResult({
   config,
   lesson,
   characters,
+  settings,
+  resultMeta,
   id = createSessionId(),
   createdAt = new Date().toISOString(),
 }) {
@@ -56,6 +67,12 @@ export function calculateSessionResult({
       .filter(item => item.correct === false)
       .map(item => item.character)
   )]
+  const timingSamples = items
+    .map(item => Number(item?.responseMs))
+    .filter(value => Number.isFinite(value) && value > 0)
+  const avgResponseMs = timingSamples.length > 0
+    ? Math.round(timingSamples.reduce((sum, value) => sum + value, 0) / timingSamples.length)
+    : null
 
   return {
     id,
@@ -68,7 +85,12 @@ export function calculateSessionResult({
     correct,
     accuracy,
     missed,
+    avgResponseMs,
+    timingSampleCount: timingSamples.length,
     items,
     characters,
+    wpm: Number(settings?.wpm) || null,
+    farnsworth: Number(settings?.farnsworth) || null,
+    ...(resultMeta && typeof resultMeta === 'object' ? resultMeta : {}),
   }
 }

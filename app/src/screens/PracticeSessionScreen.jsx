@@ -5,14 +5,25 @@ import { encodeCharacter, isSupportedCharacter } from '../core/codec/charsetCode
 import { playCharacter } from '../audio/cwAudio.js'
 import { getCharacterPlaybackDurationMs, getPostCharacterDelayMs } from '../core/morseTiming.js'
 import { buildItems, calculateSessionResult } from '../core/session.js'
+import { getWeakCharacterPracticeSet, loadSessionHistory } from '../progress.js'
 
 const MODE_LABELS = {
   identify: 'Listen & Identify',
+  copy: 'Copy Mode',
+  'speed-ladder': 'Speed Ladder',
   listen: 'Listen Only',
 }
 
 const AUTO_ADVANCE_DELAY_MS = 950
 const FALLBACK_CHARACTERS = [...new Set(LESSONS.flatMap(lesson => lesson.characters))]
+const SPEED_LADDER_ROUND_SIZE = 5
+const SPEED_LADDER_STEP_WPM = 2
+const SPEED_LADDER_THRESHOLD = 75
+
+function toNumber(value) {
+  const number = Number(value)
+  return Number.isFinite(number) ? number : 0
+}
 
 function wait(ms) {
   return new Promise(resolve => {
@@ -27,6 +38,10 @@ function getPlaybackWindowMs(char, settings) {
 }
 
 export default function PracticeSessionScreen({ config, settings, onFinish }) {
+  const effectiveSettings = useMemo(
+    () => ({ ...settings, ...(config.sessionSettingsOverride ?? {}) }),
+    [settings, config.sessionSettingsOverride]
+  )
   const lesson = useMemo(() => {
     if (Array.isArray(config.characters) && config.characters.length > 0) {
       return {
@@ -40,25 +55,66 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
   }, [config.characters, config.lessonId, config.lessonName])
   const characters = lesson?.characters ?? []
   const isIdentify = config.mode === 'identify'
+  const isCopy = config.mode === 'copy'
+  const isSpeedLadder = config.mode === 'speed-ladder'
+  const isChoiceMode = isIdentify || isSpeedLadder
+  const isScored = isChoiceMode || isCopy
   const modeLabel = MODE_LABELS[config.mode] ?? MODE_LABELS.identify
   const autoAdvance = Boolean(config.autoAdvance)
+  const sessionHistory = useMemo(() => loadSessionHistory(), [])
+  const weakCharacterSet = useMemo(() => new Set(getWeakCharacterPracticeSet(sessionHistory, {
+    limit: 16,
+    weakThreshold: 80,
+    minAttemptsForWeak: 5,
+    rollingWindow: 10,
+  })), [sessionHistory])
+  const weightedCharacters = useMemo(
+    () => characters.flatMap(character => (weakCharacterSet.has(character)
+      ? [character, character, character]
+      : [character]
+    )),
+    [characters, weakCharacterSet]
+  )
 
   const [items] = useState(() => buildItems(
     characters,
     config.length,
-    { fallbackCharacters: FALLBACK_CHARACTERS }
+    {
+      fallbackCharacters: FALLBACK_CHARACTERS,
+      weightedCharacters,
+    }
   ))
   const [index, setIndex] = useState(0)
   const [phase, setPhase] = useState('ready')
   const [selected, setSelected] = useState(null)
+  const [copyInput, setCopyInput] = useState('')
 
-  const settingsRef = useRef(settings)
-  useEffect(() => { settingsRef.current = settings }, [settings])
+  const settingsRef = useRef(effectiveSettings)
+  useEffect(() => { settingsRef.current = effectiveSettings }, [effectiveSettings])
 
   const resultsRef = useRef([])
+  const promptStartRef = useRef(null)
   const mountedRef = useRef(true)
   const playingRef = useRef(false)
   const pendingAutoPlayRef = useRef(false)
+  const baseLadderWpmRef = useRef(Math.max(5, Math.floor(toNumber(effectiveSettings.wpm || settings.wpm || 20))))
+  const highestPassingWpmRef = useRef(baseLadderWpmRef.current)
+
+  function getSettingsForItem(itemIndex) {
+    if (!isSpeedLadder) return settingsRef.current
+
+    const roundIndex = Math.floor(itemIndex / SPEED_LADDER_ROUND_SIZE)
+    const baseWpm = baseLadderWpmRef.current
+    const baseFarnsworth = Math.max(5, Math.floor(toNumber(effectiveSettings.farnsworth || settings.farnsworth || baseWpm)))
+    const roundWpm = Math.min(40, baseWpm + (roundIndex * SPEED_LADDER_STEP_WPM))
+    const roundFarnsworth = Math.min(roundWpm, Math.max(5, baseFarnsworth + (roundIndex * SPEED_LADDER_STEP_WPM)))
+
+    return {
+      ...settingsRef.current,
+      wpm: roundWpm,
+      farnsworth: roundFarnsworth,
+    }
+  }
 
   useEffect(() => {
     mountedRef.current = true
@@ -71,9 +127,9 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
     playingRef.current = true
     const resumePhase = phase
     const completionPhase = resumePhase === 'ready'
-      ? isIdentify ? 'answering' : 'revealed'
+      ? isChoiceMode ? 'answering' : isCopy ? 'copying' : 'revealed'
       : resumePhase
-    const settingsSnapshot = settingsRef.current
+    const settingsSnapshot = getSettingsForItem(index)
     let completed = false
     let completionTimer = null
 
@@ -85,6 +141,9 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
       }
       playingRef.current = false
       if (mountedRef.current) {
+        if (completionPhase === 'copying') {
+          promptStartRef.current = Date.now()
+        }
         setPhase(completionPhase)
       }
     }
@@ -130,31 +189,79 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
     setPhase('feedback')
   }
 
-  function finish() {
-    if (!isIdentify && phase === 'revealed') {
+  function handleCopySubmit(rawValue) {
+    if (phase !== 'copying') return
+
+    const value = typeof rawValue === 'string' ? rawValue.trim().toUpperCase() : ''
+    if (!value) return
+
+    const currentItem = items[index]
+    const correct = value === currentItem.char
+    const responseMs = promptStartRef.current ? Math.max(0, Date.now() - promptStartRef.current) : 0
+
+    resultsRef.current = [
+      ...resultsRef.current,
+      { character: currentItem.char, selected: value, correct, responseMs },
+    ]
+
+    setSelected(value)
+    setPhase('feedback')
+  }
+
+  function finish(resultMeta = null) {
+    if (!isScored && phase === 'revealed') {
       recordListenOnlyItem()
     }
+
+    const finalSettings = isSpeedLadder ? getSettingsForItem(Math.max(0, index)) : settingsRef.current
 
     onFinish(calculateSessionResult({
       completedItems: resultsRef.current,
       config,
       lesson,
       characters,
+      settings: finalSettings,
+      resultMeta,
     }))
   }
 
   function handleNext({ autoPlay = false } = {}) {
-    if (!isIdentify) {
+    if (!isScored) {
       recordListenOnlyItem()
+    }
+
+    if (isSpeedLadder && resultsRef.current.length > 0 && resultsRef.current.length % SPEED_LADDER_ROUND_SIZE === 0) {
+      const roundStart = resultsRef.current.length - SPEED_LADDER_ROUND_SIZE
+      const roundItems = resultsRef.current.slice(roundStart)
+      const roundCorrect = roundItems.filter(item => item.correct === true).length
+      const roundAccuracy = Math.round((roundCorrect / roundItems.length) * 100)
+      const roundIndex = Math.floor(roundStart / SPEED_LADDER_ROUND_SIZE)
+      const roundWpm = Math.min(40, baseLadderWpmRef.current + (roundIndex * SPEED_LADDER_STEP_WPM))
+
+      if (roundAccuracy >= SPEED_LADDER_THRESHOLD) {
+        highestPassingWpmRef.current = Math.max(highestPassingWpmRef.current, roundWpm)
+      } else {
+        finish({
+          finalWpm: highestPassingWpmRef.current,
+          ladderStoppedEarly: true,
+        })
+        return
+      }
     }
 
     const nextIndex = index + 1
     if (nextIndex >= items.length) {
-      finish()
+      finish({
+        finalWpm: isSpeedLadder
+          ? Math.max(highestPassingWpmRef.current, getSettingsForItem(index).wpm)
+          : null,
+        ladderStoppedEarly: false,
+      })
       return
     }
 
     setSelected(null)
+    setCopyInput('')
     pendingAutoPlayRef.current = autoPlay
     setPhase('ready')
     setIndex(nextIndex)
@@ -169,7 +276,7 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
 
   useEffect(() => {
     const shouldAutoAdvance = autoAdvance
-      && ((isIdentify && phase === 'feedback') || (!isIdentify && phase === 'revealed'))
+      && ((isScored && phase === 'feedback') || (!isScored && phase === 'revealed'))
 
     if (!shouldAutoAdvance) return undefined
 
@@ -180,7 +287,7 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
     }, AUTO_ADVANCE_DELAY_MS)
 
     return () => window.clearTimeout(timer)
-  }, [autoAdvance, index, isIdentify, phase])
+  }, [autoAdvance, index, isScored, phase])
 
   useEffect(() => {
     function handleKeyDown(event) {
@@ -202,7 +309,24 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
         return
       }
 
-      if (!isIdentify || phase !== 'answering') return
+      if (isCopy && phase === 'copying' && event.key === 'Enter') {
+        event.preventDefault()
+        handleCopySubmit(copyInput)
+        return
+      }
+
+      if (!isChoiceMode || phase !== 'answering') return
+
+      if (/^[1-4]$/.test(event.key)) {
+        const choiceIndex = Number(event.key) - 1
+        const currentItem = items[index]
+        const choice = currentItem?.choices?.[choiceIndex]
+        if (choice) {
+          event.preventDefault()
+          handleAnswer(choice)
+        }
+        return
+      }
 
       const choice = event.key.toUpperCase()
       if (!isSupportedCharacter(choice)) return
@@ -213,7 +337,7 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isIdentify, phase, index])
+  }, [isChoiceMode, isCopy, copyInput, phase, index, items])
 
 
   if (!lesson || items.length === 0) {
@@ -248,6 +372,7 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
   const correctCount = completedItems.filter(result => result.correct === true).length
   const liveAccuracy = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : null
   const progressPct = Math.round(((index + (showFeedback ? 1 : 0)) / items.length) * 100)
+  const currentLadderWpm = isSpeedLadder ? getSettingsForItem(index).wpm : null
 
   return (
     <section className="screen session-screen" aria-labelledby="session-title">
@@ -256,15 +381,21 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
           <p className="session-progress" aria-live="polite">
             {index + 1} <span className="session-progress-of">of</span> {items.length}
           </p>
-          {isIdentify && (
+          {isScored && (
             <p className="session-accuracy">
               Accuracy {liveAccuracy === null ? '—' : `${liveAccuracy}%`}
             </p>
           )}
           <p className="session-label">{modeLabel}</p>
           <p className="session-subtitle">{sessionLabel}</p>
+          {isSpeedLadder && (
+            <p className="session-source">Current round speed: {currentLadderWpm} WPM</p>
+          )}
           {config.sourceLessonName && (
             <p className="session-source">From {config.sourceLessonName}</p>
+          )}
+          {config.adaptiveReason && (
+            <p className="session-source">Adaptive: {config.adaptiveReason}</p>
           )}
         </div>
         <button type="button" className="end-btn" onClick={finish}>
@@ -293,7 +424,7 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
         >
           {phase === 'ready' ? '▶ Play' : '▶ Play Again'}
         </TouchButton>
-        {isIdentify && (
+        {isChoiceMode && (
           <TouchButton
             variant="secondary"
             size="sm"
@@ -307,12 +438,12 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
 
       {showFeedback && (
         <div className="session-feedback">
-          {isIdentify && (
+          {isScored && (
             <p className={`feedback-text ${isCorrect ? 'feedback-correct' : 'feedback-wrong'}`}>
               {isCorrect ? '✓ Correct!' : `✗ Answer: ${item.char}`}
             </p>
           )}
-          {!isIdentify && (
+          {!isScored && (
             <p className="feedback-text">Listen again or continue when you are ready.</p>
           )}
           <TouchButton onClick={handleNext}>
@@ -321,7 +452,29 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
         </div>
       )}
 
-      {isIdentify && (
+      {isCopy && (
+        <div className="copy-input-row" role="group" aria-label="Copy mode answer entry">
+          <input
+            type="text"
+            value={copyInput}
+            onChange={event => setCopyInput(event.target.value.toUpperCase())}
+            className="copy-input"
+            placeholder="Type what you heard"
+            aria-label="Type what you heard"
+            maxLength={4}
+            disabled={phase !== 'copying'}
+          />
+          <TouchButton
+            size="sm"
+            onClick={() => handleCopySubmit(copyInput)}
+            disabled={phase !== 'copying' || !copyInput.trim()}
+          >
+            Submit
+          </TouchButton>
+        </div>
+      )}
+
+      {isChoiceMode && (
         <div className="answer-grid" role="group" aria-label="Answer choices">
           {item.choices.map(choice => {
             let state = 'default'
@@ -337,7 +490,11 @@ export default function PracticeSessionScreen({ config, settings, onFinish }) {
                 className={`answer-btn answer-btn-${state}`}
                 onClick={() => handleAnswer(choice)}
                 disabled={phase !== 'answering'}
+                aria-label={`Choice ${choice}`}
               >
+                <span className="answer-btn-index" aria-hidden="true">
+                  {item.choices.indexOf(choice) + 1}
+                </span>
                 {choice}
               </button>
             )

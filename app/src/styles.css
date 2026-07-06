@@ -45,6 +45,93 @@ button {
     #101412;
 }
 
+.app-shell.app-theme-light {
+  background:
+    linear-gradient(145deg, rgba(226, 236, 231, 0.9), rgba(241, 245, 242, 0.98) 48%),
+    #ecf2ee;
+}
+
+.app-shell.app-theme-light .screen-title,
+.app-shell.app-theme-light .score-main,
+.app-shell.app-theme-light .history-card-title,
+.app-shell.app-theme-light .mastery-character,
+.app-shell.app-theme-light .mini-stat-value,
+.app-shell.app-theme-light .stat-value,
+.app-shell.app-theme-light .feedback-text,
+.app-shell.app-theme-light .touch-button-secondary {
+  color: #1e2b24;
+}
+
+.app-shell.app-theme-light .results-card,
+.app-shell.app-theme-light .history-card,
+.app-shell.app-theme-light .stat-card,
+.app-shell.app-theme-light .selection-card,
+.app-shell.app-theme-light .placeholder-copy,
+.app-shell.app-theme-light .confirm-card,
+.app-shell.app-theme-light .setting-row,
+.app-shell.app-theme-light .mini-stat {
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.app-shell.app-theme-contrast {
+  background: #000;
+}
+
+.app-shell.app-theme-contrast .touch-button {
+  background: #ffde59;
+  color: #000;
+  border-color: #fff;
+}
+
+.app-shell.app-theme-contrast .touch-button-secondary,
+.app-shell.app-theme-contrast .option-btn,
+.app-shell.app-theme-contrast .plan-picker-toggle,
+.app-shell.app-theme-contrast .plan-picker-option,
+.app-shell.app-theme-contrast .setup-input,
+.app-shell.app-theme-contrast .copy-input,
+.app-shell.app-theme-contrast .end-btn {
+  background: #000;
+  color: #fff;
+  border-color: #fff;
+}
+
+.app-shell.app-theme-contrast .results-card,
+.app-shell.app-theme-contrast .history-card,
+.app-shell.app-theme-contrast .stat-card,
+.app-shell.app-theme-contrast .selection-card,
+.app-shell.app-theme-contrast .confirm-card,
+.app-shell.app-theme-contrast .mini-stat,
+.app-shell.app-theme-contrast .feedback-text {
+  background: #000;
+  border-color: #fff;
+}
+
+.app-shell.app-large-text {
+  font-size: 1.1em;
+}
+
+.app-shell.app-reduced-motion *,
+.app-shell.app-reduced-motion *::before,
+.app-shell.app-reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+.app-shell.app-large-touch .touch-button {
+  min-height: 88px;
+}
+
+.app-shell.app-large-touch .option-btn,
+.app-shell.app-large-touch .plan-picker-toggle,
+.app-shell.app-large-touch .plan-picker-option,
+.app-shell.app-large-touch .answer-btn,
+.app-shell.app-large-touch .copy-input,
+.app-shell.app-large-touch .end-btn {
+  min-height: 56px;
+}
+
 .home-screen,
 .placeholder-screen {
   width: min(100%, 760px);
@@ -79,6 +166,19 @@ h1 {
   color: #ffd676;
   font-size: clamp(1.5rem, 3.5vw, 2.5rem);
   font-weight: 700;
+}
+
+.home-review-note {
+  margin: 14px 0 0;
+  color: #b9c7b5;
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  font-weight: 700;
+}
+
+.home-review-note-secondary {
+  margin-top: 6px;
+  color: #9fb19b;
+  font-size: clamp(0.92rem, 2vw, 1.08rem);
 }
 
 .action-stack {
@@ -778,6 +878,33 @@ h1 {
   flex-shrink: 0;
 }
 
+.copy-input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 180px);
+  gap: 10px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.copy-input {
+  min-height: 54px;
+  border: 2px solid #344d42;
+  border-radius: 8px;
+  background: #1a2a22;
+  color: #fffaf0;
+  padding: 10px 14px;
+  font: inherit;
+  font-size: clamp(1.05rem, 2.4vw, 1.35rem);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.copy-input:focus {
+  outline: none;
+  border-color: #ffd676;
+  box-shadow: 0 0 0 3px rgba(255, 214, 118, 0.2);
+}
+
 .answer-btn {
   min-height: 72px;
   border: 2px solid transparent;
@@ -790,6 +917,16 @@ h1 {
   cursor: pointer;
   touch-action: manipulation;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  position: relative;
+}
+
+.answer-btn-index {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  opacity: 0.8;
 }
 
 .answer-btn:active:not(:disabled) {
@@ -1036,6 +1173,31 @@ h1 {
   flex-shrink: 0;
 }
 
+.accuracy-gauge-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 2px;
+}
+
+.accuracy-gauge {
+  --gauge-size: 150px;
+  width: var(--gauge-size);
+  height: var(--gauge-size);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at center, rgba(20, 28, 24, 0.95) 56%, transparent 57%),
+    conic-gradient(var(--gauge-color) var(--gauge-value), #2c3f36 0%);
+  border: 1px solid #344d42;
+}
+
+.accuracy-gauge-value {
+  color: #fffaf0;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 800;
+}
+
 /* ─── Settings ─────────────────────────────────────────────────────────────── */
 
 .settings-form {
@@ -1105,6 +1267,27 @@ h1 {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
+.settings-data-tools {
+  border: 1px solid #344d42;
+  border-radius: 8px;
+  padding: 14px;
+  background: rgba(20, 28, 24, 0.72);
+}
+
+.settings-data-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.settings-data-actions .touch-button {
+  min-height: 52px;
+}
+
+.settings-data-input {
+  display: none;
+}
+
 /* ─── Progress ──────────────────────────────────────────────────────────────── */
 
 .progress-screen {
@@ -1167,6 +1350,113 @@ h1 {
   font-size: 1rem;
 }
 
+.inline-action-row {
+  margin-top: 12px;
+}
+
+.rolling-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.rolling-chip {
+  min-height: 96px;
+  border: 1px solid #344d42;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: rgba(36, 54, 47, 0.72);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.rolling-chip-strong {
+  border-color: #4c8a56;
+  background: rgba(58, 125, 68, 0.32);
+}
+
+.rolling-chip-building {
+  border-color: #aa9150;
+  background: rgba(170, 145, 80, 0.22);
+}
+
+.rolling-chip-weak {
+  border-color: #9b4343;
+  background: rgba(139, 32, 32, 0.26);
+}
+
+.rolling-character {
+  color: #fffaf0;
+  font-size: 1.6rem;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.rolling-detail {
+  color: #e1dbc8;
+  font-size: 0.83rem;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.confusion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.confusion-row {
+  margin: 0;
+  color: #e1dbc8;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.confusion-count {
+  color: #ffd676;
+  font-weight: 800;
+}
+
+.trend-chart {
+  width: 100%;
+  height: 88px;
+  color: #ffd676;
+  border-radius: 8px;
+  background: rgba(36, 54, 47, 0.42);
+  border: 1px solid #344d42;
+  padding: 4px;
+}
+
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.achievement-chip {
+  min-height: 66px;
+  border: 1px solid #8f6b2f;
+  border-radius: 8px;
+  background: rgba(255, 214, 118, 0.14);
+  color: #fffaf0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+}
+
+.achievement-icon {
+  font-size: 1.3rem;
+}
+
+.achievement-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
 .mastery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
@@ -1183,6 +1473,12 @@ h1 {
   flex-direction: column;
   justify-content: center;
   gap: 4px;
+  cursor: pointer;
+}
+
+.mastery-chip:focus-visible {
+  outline: 3px solid #ffd676;
+  outline-offset: 2px;
 }
 
 .mastery-chip-solid {
