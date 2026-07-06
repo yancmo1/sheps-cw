@@ -14,7 +14,7 @@ app/
 ├── Dockerfile
 └── vite.config.js
 
-legacy/
+docs/Archive/Legacy Prototype/
 └── app-prototype/       # archived earlier dashboard prototype
 ```
 
@@ -77,7 +77,7 @@ app/
 Do not add new product behavior in:
 
 ```text
-legacy/app-prototype/
+docs/Archive/Legacy Prototype/app-prototype/
 ```
 
 ## Pi Install Path Note

@@ -21,7 +21,7 @@ app/
 ├── Dockerfile
 └── vite.config.js
 
-legacy/
+docs/Archive/Legacy Prototype/
 └── app-prototype/       # archived earlier dashboard prototype
 ```
 
@@ -34,7 +34,7 @@ app/
 The older dashboard was moved to:
 
 ```text
-legacy/app-prototype/
+docs/Archive/Legacy Prototype/app-prototype/
 ```
 
 ## Deployment Alignment
@@ -114,7 +114,7 @@ Those belong after the app shell, kiosk launch, and project structure are stable
 ## Next Best Tasks
 
 1. Keep top-level `app/` as the only active Dit Dit app home.
-2. Keep `legacy/app-prototype/` as read-only reference unless intentionally revived.
+2. Keep `docs/Archive/Legacy Prototype/app-prototype/` as read-only reference unless intentionally revived.
 3. Test the app locally.
 4. Test the app through local Docker with `docker-compose.local.yml`.
 5. Test on the Raspberry Pi touchscreen.
@@ -133,7 +133,7 @@ The early practice experience should stay simple:
 
 ## Open Decisions
 
-- Should the project eventually remove `legacy/app-prototype/` entirely or keep it as historical reference?
+- Should the project eventually remove `docs/Archive/Legacy Prototype/app-prototype/` entirely or keep it as historical reference?
 - Should the kiosk launcher remain in `deploy/pi/` or move to a dedicated runtime package later?
 - Should the app name be `Dit Dit`, `Dit Dit Box`, or `Dit Dit CW Trainer` on the device home screen?
 - Should the exit flow only exit fullscreen browser, or should it stop the service and return to desktop?

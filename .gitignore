@@ -13,6 +13,7 @@ venv/
 # Build
 dist/
 build/
+coverage/
 
 # Logs
 *.log
@@ -28,5 +29,6 @@ build/
 # Node
 node_modules/
 
-#Folders
-prd-ignored/
+# Obsidian device/window state
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json

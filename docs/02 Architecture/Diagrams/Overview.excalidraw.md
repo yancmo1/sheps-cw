@@ -22,7 +22,7 @@ ANjvXYpI: [[Audio Engine]]
 
 aGVpbBdE: [[Statistics]]
 
-7aP9TGBI: [[Projects/CW Trainer/Docs/Learning Engine]]
+7aP9TGBI: [[Learning Engine]]
 
 %%
 ## Drawing

@@ -4,15 +4,23 @@ import { KOCH_LESSONS } from '../src/data/lessons/koch.js'
 import { LICW_LESSONS } from '../src/data/lessons/licw.js'
 import { NUMBER_LESSONS } from '../src/data/lessons/numbers.js'
 import { REVIEW_LESSONS } from '../src/data/lessons/review.js'
+import { PROSIGN_LESSONS } from '../src/data/lessons/prosigns.js'
+import { COMMON_LESSONS } from '../src/data/lessons/common.js'
+import { ABBREVIATIONS_LESSONS } from '../src/data/lessons/abbreviations.js'
+import { CONFUSING_PAIRS_LESSONS } from '../src/data/lessons/confusing-pairs.js'
 import { LESSONS } from '../src/data/lessons/index.js'
 
-const LESSON_GROUPS = {
-  beginner: BEGINNER_LESSONS,
-  koch: KOCH_LESSONS,
-  licw: LICW_LESSONS,
-  numbers: NUMBER_LESSONS,
-  review: REVIEW_LESSONS,
-}
+const LESSON_GROUPS = [
+  { source: 'beginner.js', lessons: BEGINNER_LESSONS, allowedFamilies: ['beginner'] },
+  { source: 'koch.js', lessons: KOCH_LESSONS, allowedFamilies: ['koch'] },
+  { source: 'licw.js', lessons: LICW_LESSONS, allowedFamilies: ['licw'] },
+  { source: 'numbers.js', lessons: NUMBER_LESSONS, allowedFamilies: ['numbers'] },
+  { source: 'review.js', lessons: REVIEW_LESSONS, allowedFamilies: ['review'] },
+  { source: 'prosigns.js', lessons: PROSIGN_LESSONS, allowedFamilies: ['prosigns'] },
+  { source: 'common.js', lessons: COMMON_LESSONS, allowedFamilies: ['comprehensive', 'vocabulary'] },
+  { source: 'abbreviations.js', lessons: ABBREVIATIONS_LESSONS, allowedFamilies: ['vocabulary'] },
+  { source: 'confusing-pairs.js', lessons: CONFUSING_PAIRS_LESSONS, allowedFamilies: ['pairs'] },
+]
 
 const REQUIRED_STRING_FIELDS = ['id', 'name', 'family', 'path', 'description']
 const REQUIRED_NUMERIC_FIELDS = ['recommendedWPM', 'recommendedFarnsworth']
@@ -21,9 +29,9 @@ function fail(message) {
   throw new Error(message)
 }
 
-function validateLessonShape(lesson, expectedFamily) {
+function validateLessonShape(lesson, source, allowedFamilies) {
   if (!lesson || typeof lesson !== 'object' || Array.isArray(lesson)) {
-    fail(`Lesson in family "${expectedFamily}" must be an object.`)
+    fail(`Lesson in "${source}" must be an object.`)
   }
 
   for (const field of REQUIRED_STRING_FIELDS) {
@@ -38,8 +46,11 @@ function validateLessonShape(lesson, expectedFamily) {
     }
   }
 
-  if (lesson.family !== expectedFamily) {
-    fail(`Lesson "${lesson.id}" has family "${lesson.family}" but is stored in "${expectedFamily}.js".`)
+  if (!allowedFamilies.includes(lesson.family)) {
+    fail(
+      `Lesson "${lesson.id}" has family "${lesson.family}" but "${source}" allows: `
+      + `${allowedFamilies.join(', ')}.`
+    )
   }
 
   if (!Array.isArray(lesson.characters) || lesson.characters.length === 0) {
@@ -60,13 +71,13 @@ function validateGroups() {
   const ids = new Set()
   const orderedLessons = []
 
-  for (const [family, lessons] of Object.entries(LESSON_GROUPS)) {
+  for (const { source, lessons, allowedFamilies } of LESSON_GROUPS) {
     if (!Array.isArray(lessons)) {
-      fail(`Lesson family "${family}" must export an array.`)
+      fail(`Lesson source "${source}" must export an array.`)
     }
 
     for (const lesson of lessons) {
-      validateLessonShape(lesson, family)
+      validateLessonShape(lesson, source, allowedFamilies)
 
       if (ids.has(lesson.id)) {
         fail(`Duplicate lesson id detected: "${lesson.id}".`)
@@ -91,4 +102,4 @@ function validateGroups() {
 }
 
 validateGroups()
-console.log(`Validated ${LESSONS.length} lessons across ${Object.keys(LESSON_GROUPS).length} families.`)
+console.log(`Validated ${LESSONS.length} lessons across ${LESSON_GROUPS.length} lesson sources.`)

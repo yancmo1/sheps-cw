@@ -10,23 +10,22 @@ The repository also doubles as an Obsidian planning vault. Project intent and fe
 
 - Frontend: React 19, Vite 8, JavaScript modules.
 - Current app target: `app/`.
-- Earlier dashboard prototype has been archived under `legacy/app-prototype/`.
+- Earlier dashboard prototype has been archived under `docs/Archive/Legacy Prototype/app-prototype/`.
 - Build/dev commands should be run from the intended app folder.
 - Pi appliance container: `deploy/pi/docker-compose.yml` builds the active app from `app/` and serves it with nginx at `http://localhost:3000`.
-- Root `src/`, `tests/`, and `assets/` are reserved for future non-UI/core work.
 
 ## Important Structure Warning
 
 There is one active React app and one archived prototype:
 
 ```text
-app/src/                          # active Dit Dit touch-first app
-legacy/app-prototype/src/         # archived dashboard prototype
+app/src/                                           # active Dit Dit touch-first app
+docs/Archive/Legacy Prototype/app-prototype/src/   # archived dashboard prototype
 ```
 
 Prefer `app/` for all new React work.
 
-Do not accidentally add new feature work to `legacy/app-prototype/`.
+Do not accidentally add new feature work to `docs/Archive/Legacy Prototype/app-prototype/`.
 
 ## Useful Commands
 
@@ -44,7 +43,7 @@ npm run preview
 For the archived prototype, only if intentionally reviewing legacy work:
 
 ```sh
-cd legacy/app-prototype
+cd "docs/Archive/Legacy Prototype/app-prototype"
 npm run dev
 npm run lint
 npm run build
@@ -108,9 +107,9 @@ Current target app:
 
 Older prototype is archived under:
 
-- Main entry: `legacy/app-prototype/src/main.jsx`.
-- App shell: `legacy/app-prototype/src/App.jsx`.
-- Dashboard: `legacy/app-prototype/src/Dashboard.jsx`.
+- Main entry: `docs/Archive/Legacy Prototype/app-prototype/src/main.jsx`.
+- App shell: `docs/Archive/Legacy Prototype/app-prototype/src/App.jsx`.
+- Dashboard: `docs/Archive/Legacy Prototype/app-prototype/src/Dashboard.jsx`.
 
 ## Working Conventions
 
@@ -123,7 +122,7 @@ Older prototype is archived under:
 ## Known Gaps
 
 - Use `/opt/ditditbox` as the canonical Pi checkout/install path for appliance deployment.
-- The root README is stale and should be updated soon.
+- The root README should be kept aligned with the active app and Obsidian workspace.
 - No dedicated reusable core Morse engine package exists yet.
 - No hardware key, paddle, or GPIO input exists yet.
 - Lesson progression and adaptive learning are still future phases.

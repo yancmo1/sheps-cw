@@ -2,7 +2,7 @@
 
 **Last Updated:** July 1, 2026  
 **Status:** Phase 1 content + UX + core extraction + live CW input decode complete; adaptive foundation next  
-**Reference Document:** [Dit_Dit_Design_Review_and_Improvements.md](Dit_Dit_Design_Review_and_Improvements.md) (archived June 29 — comprehensive 40+ improvement opportunities, basis for this checklist)
+**Reference Document:** [[Dit Dit Design Review and Improvements]] (archived June 29 — comprehensive 40+ improvement opportunities, basis for this checklist)
 
 ---
 

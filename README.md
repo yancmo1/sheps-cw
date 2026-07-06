@@ -1,226 +1,174 @@
 # Sheps CW
 
-A modern Morse Code (CW) training project with a touch-first Dit Dit app and a long-term core-first architecture.
+Sheps CW is a W5XY Labs Morse code training project. The current product is **Dit Dit**, a touch-first React/Vite CW trainer that runs in the browser and can be deployed as a Raspberry Pi touchscreen appliance.
 
-The project is being developed with a **core-first** architecture, allowing the Morse engine to remain independent from the user interface, audio system, and hardware platform. While the initial target is Raspberry Pi appliance deployment, the long-term goal is dedicated hardware.
+The repository also serves as the Obsidian vault for project planning, product notes, architecture notes, research, and decisions.
 
-**Project & Product Names**:
+## Current Implementation
 
-- **Dit Dit**: The React/Vite app and main CW trainer product (W5XY Labs brand)
-- **Dit Dit Box**: The Raspberry Pi appliance deployment of Dit Dit
-- **Didah Method**: The friendly learning methodology and educational approach
+The active application lives in `app/`.
 
----
+Current Dit Dit capabilities include:
 
-# Project Goals
+- Touch-first Home, Practice Setup, Practice Session, Results, Progress, Settings, Key Decode, and Exit screens
+- Browser-based Morse audio
+- Local settings persistence
+- Local progress history
+- Structured lesson data
+- Missed-character practice
+- Straight-key and paddle-oriented browser input for key decode practice
+- Raspberry Pi kiosk/deployment foundation under `deploy/pi/`
 
-- Build a modular Morse training engine.
-- Support beginners through advanced operators.
-- Provide adaptive learning based on individual performance.
-- Support keyboards, paddles, straight keys, and future hardware.
-- Run on desktop systems during development and embedded hardware for deployment.
+The older dashboard prototype is archived under `docs/Archive/Legacy Prototype/app-prototype/` for reference only.
 
----
+## Architecture Direction
 
-# Development Philosophy
+The long-term direction is a reusable core Morse learning engine that can run behind desktop UI, Raspberry Pi deployment, and future dedicated hardware.
 
-The project is designed around a layered architecture.
+Planned layering:
 
-```
+```text
 Application
-    │
 User Interface
-    │
 Services
-    │
 Core Morse Engine
-    │
 Hardware / Audio / Storage
 ```
 
-The **Core Morse Engine** contains the business logic and should never depend on the UI, GPIO, or audio implementations.
+Core behavior should remain independent from React, browser audio, GPIO, storage, and platform-specific launchers. When adding timing, lesson progression, statistics, or adaptive-learning behavior, prefer pure testable modules that UI and future hardware surfaces can consume.
 
-This allows the same engine to power:
+## Repository Layout
 
-- Desktop applications
-- Raspberry Pi devices
-- Future handheld hardware
-- Automated testing
-
----
-
-# Current Repository Layout
-
-```
-app/                    # canonical Dit Dit React/Vite app
-docker-compose.local.yml # local/dev Docker convenience for the active app
-deploy/pi/              # Pi service, compose, launcher, desktop scripts
-docs/                   # planning and architecture notes
-legacy/app-prototype/   # archived earlier dashboard prototype
-src/ tests/ assets/     # placeholders for future core-first modules
-```
-
-Documentation is maintained under:
-
-```
-docs/
-├── Architecture/
-├── Diagrams/
-├── Excalidraw/
-├── Features/
-├── Reference/
-└── Templates/
+```text
+app/                         # active Dit Dit React/Vite app
+deploy/pi/                   # Raspberry Pi compose, service, and launcher scripts
+docs/                        # Obsidian project vault notes
+docs/00 Home/                # dashboard and overview
+docs/01 Product/             # product, branding, glossary, PRD
+docs/02 Architecture/        # architecture notes, diagrams, core API docs
+docs/03 Learning/            # learning and feature notes
+docs/04 Hardware/            # hardware notes
+docs/05 Development/         # sprint, roadmap, prompts, future ideas
+docs/06 Research/            # research inbox and research notes
+docs/07 Decisions/           # decision log and records
+docs/Templates/              # reusable Obsidian templates
+docs/Archive/                # legacy prototype and historical notes
+media/                       # vault media and attachments
+docker-compose.local.yml     # local Docker convenience for the active app
+workspace.code-workspace     # VS Code workspace
 ```
 
----
+## Obsidian Usage
 
-# Current App Status
+Open the repository root as the Obsidian vault. The primary landing page is:
 
-## What's Working
-
-Dit Dit is a touch-first Morse code training app with browser-based audio and local persistence. The current release includes:
-
-- **Audio**: Browser-based Morse audio generation with adjustable tone and speed (Farnsworth timing support)
-- **Practice**: Touch-friendly practice session interface with visual and audio feedback
-- **Lessons**: 42 lessons across 9 learning paths (Koch Method, LICW, Beginner, Numbers, Prosigns, Abbreviations, Confusing Pairs, Common, Review)
-- **Practice Setup**: Learning Plans dropdown with multiselect lesson interface; supports combining lessons and custom character input
-- **Character Coverage**: Full alphabet (26 letters), digits (0-9), 7 prosigns (AR, SK, BT, AS, KN, CA, SOS)
-- **Persistence**: Local settings (speed, tone, volume) and practice history saved in browser
-- **Missed-Character Practice**: Focused practice on characters you got wrong
-- **Navigation**: Touch-first home screen with Practice, Key Decode, Progress, Settings, and Exit flows
-- **Live Input Decode**: New Key Decode screen supports straight-key and paddle input, Iambic A/B modes, sidetone, live Morse decoding, and touch-key testing
-- **Speed Feedback**: Character-speed tracking shows last and average WPM while you key
-- **Pi Integration**: Ready for deployment on Raspberry Pi touchscreen with kiosk/exit behavior
-
-## Non-Goals (Until Core Engine Exists)
-
-- GPIO hardware key/paddle input
-- Adaptive learning (static lessons only for now)
-- Backend services or user accounts
-- Full scoring/analytics
-
----
-
-# Development: Quick Start
-
-## Local Development
-
-From `app/` directory:
-
-```bash
-cd app
-npm install
-npm run dev
+```text
+docs/00 Home/Project Dashboard.md
 ```
 
-Browser opens at `http://localhost:5173`.
+Stable vault configuration can be tracked, but device/window state is ignored:
+
+```text
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+```
+
+## Development Commands
+
+Install app dependencies:
+
+```sh
+npm --prefix app install
+```
+
+Run the app in development:
+
+```sh
+npm --prefix app run dev
+```
+
+Build the app:
+
+```sh
+npm --prefix app run build
+```
+
+Run tests:
+
+```sh
+npm --prefix app run test
+```
+
+Validate lesson data:
+
+```sh
+npm --prefix app run validate:lessons
+```
+
+Root convenience scripts are also available:
+
+```sh
+npm run ditdit:install
+npm run ditdit:dev
+npm run ditdit:build
+npm run ditdit:preview
+```
 
 ## Local Docker
 
-From repository root, build and serve on port `8080`:
+From the repository root:
 
-```bash
+```sh
 docker compose -f docker-compose.local.yml up -d --build
 ```
 
-Visit `http://localhost:8080`. Tear down with:
+The local container serves the active app at:
 
-```bash
+```text
+http://localhost:8080
+```
+
+Stop it with:
+
+```sh
 docker compose -f docker-compose.local.yml down
 ```
 
-## Pi Deployment
+## Raspberry Pi Deployment
 
-The active app builds into Dit Dit Box appliance through `deploy/pi/`:
+The Pi appliance layer builds the active `app/` and serves it with nginx at `http://localhost:3000`.
 
-```bash
+```sh
 docker compose -f deploy/pi/docker-compose.yml build
-docker compose -f deploy/pi/docker-compose.yml up -d
+docker compose -f deploy/pi/docker-compose.yml up -d --no-build
 ```
 
-Dit Dit Box serves at `http://localhost:3000` on the Pi and launches in kiosk mode with exit-to-desktop support.
+Useful Pi scripts live under `deploy/pi/`.
 
-Pi appliance install path expectation:
+Canonical Pi checkout/install path:
 
 ```text
 /opt/ditditbox
 ```
 
-# Development Setup
+## Current Status
 
-Current development platform:
+Dit Dit is an early working app, not just a mockup. The near-term focus is:
 
-- macOS
-- Visual Studio Code
-- Obsidian (documentation in `docs/`)
-- Excalidraw (architecture diagrams)
-- GitHub (source control)
+- Keep the active app stable
+- Harden Raspberry Pi kiosk startup and exit behavior
+- Continue extracting reusable core behavior
+- Build adaptive-learning behavior on top of tested core modules
+- Keep the Obsidian workspace organized enough to guide future work
 
-Current input options:
+## Key Notes
 
-- **Straight key** input via keyboard or touch key
-- **Paddle input** with Iambic A/B selection
-- **Live decode feedback** with sidetone and character-speed tracking
+- [[Project Dashboard]]
+- [[Project Overview]]
+- [[Current App Structure]]
+- [[Roadmap]]
+- [[Decision Log]]
 
-GPIO hardware input support remains a planned next step for real key/paddle integration beyond browser-based testing.
-
----
-
-# Current Status
-
-**Phase**: Active app foundation + Pi deployment testing.
-
-**Current Focus**:
-
-1. Refine the live key-decode experience for straight keys and paddles
-2. Verify touch-first practice flow works smoothly on Pi touchscreen
-3. Harden kiosk startup (cancel-to-desktop behavior)
-4. Test local persistence and multi-session workflows
-5. Build adaptive learning features on top of extracted core modules
-
-**Single Source of Truth**:
-
-- `app/` = canonical Dit Dit React app
-- `deploy/pi/` = Dit Dit Box appliance layer
-- `legacy/app-prototype/` = archived (reference only)
-
----
-
-# Development Roadmap
-
-**See [ROADMAP_AND_CHECKLIST.md](docs/ROADMAP_AND_CHECKLIST.md) for detailed, trackable implementation plan organized by phase.**
-
-This document contains:
-- ✅ Completed work (what's already in the app)
-- 🔴 Phase 1: Critical Foundation (weeks 1–4)
-- 🟡 Phase 2: Learning Intelligence (weeks 5–8)
-- 🟢 Phase 3: Polish & Engagement (weeks 9–12)
-- 🟣 Phase 4: Advanced Features (week 13+)
-
-Each item includes acceptance criteria and dependencies.
-
----
-
-### Quick Status
-
-**Phase 1 Progress: 80% Complete**
-
-- [x] Touch-first app foundation + browser audio
-- [x] Local persistence (settings + progress history)
-- [x] Multiple lesson paths (Beginner, Koch, LICW, Numbers, Review)
-- [x] Raspberry Pi deployment + kiosk integration
-- [x] Comprehensive character coverage (26 letters + digits + 7 prosigns)
-- [x] Structured 42-lesson library organized by learning paths
-- [x] Practice Setup UX (Learning Plans dropdown + multiselect lessons)
-- [x] Core Morse engine extraction (reusable, testable)
-- [x] Unit tests for core timing/codec/session (>90% core coverage)
-- [x] Live key-decode input flow (straight key, paddle, Iambic A/B, sidetone, speed tracking)
-- [ ] Adaptive learning engine
-
-See **[ROADMAP_AND_CHECKLIST.md](docs/ROADMAP_AND_CHECKLIST.md)** for detailed phase breakdown and next steps.
-
----
-
-# License
+## License
 
 License to be determined.
